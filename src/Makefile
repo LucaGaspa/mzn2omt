@@ -17,6 +17,12 @@ YACC = bison -d
 
 CC = g++ -w
 
+# calc is the final object that we will generate, it is produced by
+# the C compiler from the y.tab.o and from the lex.yy.o
+
+calc: parser.tab.o lex.yy.o
+	$(CC) -o ../bin/mzn2smt parser.tab.o lex.yy.o
+
 # These dependency rules indicate that 
 # (1) lex.yy.o depends on lex.yy.c and y.tab.h
 # (2) lex.yy.o and y.tab.o depend on calc.h.
@@ -37,12 +43,6 @@ parser.tab.c parser.tab.h: parser.y
 
 lex.yy.c: lexer.l
 	$(LEX) lexer.l
-
-# calc is the final object that we will generate, it is produced by
-# the C compiler from the y.tab.o and from the lex.yy.o
-
-calc: parser.tab.o lex.yy.o
-	$(CC) -o ../bin/mzn2smt parser.tab.o lex.yy.o
 
 
 ## Make clean will delete all of the generated files so we can start
