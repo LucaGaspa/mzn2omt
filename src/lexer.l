@@ -1,5 +1,5 @@
 %{
-	#include "y.tab.h"
+	#include "parser.tab.h"
 %}
 
 %x string

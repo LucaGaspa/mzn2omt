@@ -1,12 +1,13 @@
 %{  
 	#include <iostream>
 	#include <stdlib.h>
+	#include "calc.h"
 	void yyerror(const char *);
 	int yylex(void);
 %}
 
 %union {
-
+	Expr_node* expr;
 }
 
 %error-verbose
@@ -119,6 +120,7 @@
 %token MZN_COLONCOLON_QUOTED "'::'"
 %token MZN_PLUSPLUS_QUOTED "'++'"
 
+%type <expr> expr
 
 %%
 
