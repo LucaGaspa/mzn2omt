@@ -22,6 +22,7 @@ class binSet {
 };
 
 class uValue {
+public:
 	Lit_type type;
 	union{
 		int iValue;

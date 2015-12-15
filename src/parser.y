@@ -11,6 +11,7 @@
 %{  
 	#include <iostream>
 	#include <stdlib.h>
+	#include <stdio.h>
 	#include "calc.h"
 	void yyerror(const char *);
 	int yylex(void);
@@ -18,12 +19,14 @@
 
 %union {
 	Expr_node* expr;
+	char* ident;
+	uValue* lit;
 }
 
 %error-verbose
 
-%token <literal> MZN_INTEGER_LITERAL "integer literal" MZN_BOOL_LITERAL "bool literal"
-%token <literal> MZN_FLOAT_LITERAL "float literal"
+%token <lit> MZN_INTEGER_LITERAL "integer literal" MZN_BOOL_LITERAL "bool literal"
+%token <lit> MZN_FLOAT_LITERAL "float literal"
 %token <ident> MZN_IDENTIFIER "identifier" MZN_QUOTED_IDENTIFIER "quoted identifier" MZN_STRING_LITERAL "string literal"
 %token MZN_STRING_QUOTE_START "interpolated string start" MZN_STRING_QUOTE_MID "interpolated string middle" MZN_STRING_QUOTE_END "interpolated string end"
 %token MZN_TI_IDENTIFIER "type-inst identifier" MZN_DOC_COMMENT "documentation comment" MZN_DOC_FILE_COMMENT "file-level documentation comment"
@@ -459,7 +462,9 @@ expr_atom_head :
     | MZN_UNDERSCORE array_access_tail
       { }
     | MZN_BOOL_LITERAL
-      { }
+      {
+      	printf("bella: %d\n", $1->bValue);
+      }
     | MZN_INTEGER_LITERAL
       { }
     | MZN_INFINITY

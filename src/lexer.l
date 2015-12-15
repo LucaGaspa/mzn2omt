@@ -64,7 +64,10 @@
 %[^\xa]*          { /* ignore comments */ }
 
 "true"            { //yylval.literal.litType = BOOLTYPE;
-					//yylval.literal.bValue = 1;					
+					//yylval.literal.bValue = 1;
+					yylval.lit = new uValue;
+					yylval.lit->type = BOOL;
+					yylval.lit->bValue = 1;
 					return MZN_BOOL_LITERAL; }
 "false"           { //yylval.literal.litType = BOOLTYPE;
 					//yylval.literal.bValue = 0;					
