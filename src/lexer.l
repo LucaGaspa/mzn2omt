@@ -1,3 +1,13 @@
+/*********************************************************************** 
+ * lexer.l                                                             *
+ *                                                                     *
+ * Copyright (C) 2015 Luca Gasparetto                                  *
+ * All rights reserved.                                                *
+ *                                                                     *
+ * This software may be modified and distributed under the terms       *
+ * of the MIT license.  See the LICENSE file for details.              *
+ ***********************************************************************/
+
 %{
 	#include "calc.h"
 	#include "parser.tab.h"
