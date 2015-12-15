@@ -11,6 +11,9 @@
 %{
 	#include "calc.h"
 	#include "parser.tab.h"
+	#include <cstring>
+	
+	int line = 1;
 %}
 
 %x string
@@ -28,22 +31,22 @@
 					}
 
 \xa               	{
-						
+						line++;
                   	}
 [ \f\xd\t]         	{/* ignore whitespace */}
 
 "/**"             	{}
 <doccomment>{
   "*/"            	{}
-  [^*\xa]+       	{}
+  [^*\xa]+       	{line++;}
   "*"             	{}
-  \xa               {}
+  \xa               {line++;}
 }
 
 "/***"             	{}
 <doccomment_file>{
   "*/"            	{return MZN_DOC_FILE_COMMENT; }
-  [^*\xa]+       	{}
+  [^*\xa]+       	{line++;}
   "*"             	{}
   \xa              	{}
 }
@@ -51,9 +54,9 @@
 "/*"              	{}
 <multilinecomment>{
   "*/"            	{}
-  [^*\xa]+       	{}
+  [^*\xa]+       	{line++;}
   "*"             	{}
-  \xa               {}
+  \xa               {line++;}
 }
 
 
@@ -63,37 +66,44 @@
 "|]"              { return MZN_RIGHT_2D_BRACKET; }
 %[^\xa]*          { /* ignore comments */ }
 
-"true"            { //yylval.literal.litType = BOOLTYPE;
-					//yylval.literal.bValue = 1;
-					yylval.lit = new uValue;
+"true"            { yylval.lit = new uValue;
 					yylval.lit->type = BOOL;
 					yylval.lit->bValue = 1;
 					return MZN_BOOL_LITERAL; }
-"false"           { //yylval.literal.litType = BOOLTYPE;
-					//yylval.literal.bValue = 0;					
+"false"           { yylval.lit = new uValue;
+					yylval.lit->type = BOOL;
+					yylval.lit->bValue = 0;
 					return MZN_BOOL_LITERAL; }
-[0-9]+            {	//yylval.literal.litType = INTTYPE;
-					//yylval.literal.iValue = atoi(yytext);					
+[0-9]+            {	yylval.lit = new uValue;
+					yylval.lit->type = INT;
+					yylval.lit->bValue = atoi(yytext);
 					return MZN_INTEGER_LITERAL;}
 0x[0-9A-Fa-f]+    { //BASE 16
-					//yylval.literal.litType = INTTYPE;
-					//yylval.literal.iValue = strtol(yytext, NULL, 16);					
+					yylval.lit = new uValue;
+					yylval.lit->type = INT;
+					yylval.lit->bValue = strtol(yytext, NULL, 16);
 					return MZN_INTEGER_LITERAL;}
 0o[0-7]+          { //BASE 8
-					//yylval.literal.litType = INTTYPE;
-					//yylval.literal.iValue = strtol(yytext, NULL, 8);					
+					yylval.lit = new uValue;
+					yylval.lit->type = INT;
+					yylval.lit->bValue = strtol(yytext, NULL, 8);
 					return MZN_INTEGER_LITERAL;}
-[0-9]+\.[0-9]+    { //yylval.literal.litType = FLOATTYPE;
-					//yylval.literal.fValue = atof(yytext);					
+[0-9]+\.[0-9]+    { yylval.lit = new uValue;
+					yylval.lit->type = FLOAT;
+					yylval.lit->bValue = atof(yytext);
 					return MZN_FLOAT_LITERAL;}
 [0-9]+\.[0-9]+[Ee][+-]?[0-9]+  {
-                    //yylval.literal.litType = FLOATTYPE;
-					//yylval.literal.fValue = atof(yytext);					
+                    yylval.lit = new uValue;
+					yylval.lit->type = FLOAT;
+					/*TODO::atof exp?*/
+					yylval.lit->bValue = atof(yytext);
 					return MZN_FLOAT_LITERAL;
                    }
 [0-9]+[Ee][+-]?[0-9]+  {
-                    //yylval.literal.litType = FLOATTYPE;
-					//yylval.literal.fValue = atof(yytext);					
+                    yylval.lit = new uValue;
+					yylval.lit->type = FLOAT;
+					/*TODO::atof exp?*/
+					yylval.lit->bValue = atof(yytext);
 					return MZN_FLOAT_LITERAL;
                    }
 [:;|{},\[\]\.]    { return *yytext; }
@@ -202,21 +212,23 @@ _                 { return MZN_UNDERSCORE; }
 "'~"[+*=-]"'"	  { return MZN_IDENTIFIER; }
 
 [A-Za-z][A-Za-z0-9_]* { 
-					//yylval.ident = (char*) malloc(sizeof(char)*(strlen(yytext)+1));
-					//strcpy(yylval.ident, yytext);
-					//sprintf(yylval.ident, "%s\0",yytext);
-                   	return MZN_IDENTIFIER; }
+						yylval.ident = new char[strlen(yytext)+1];
+		               	strcpy(yylval.ident, yytext);
+		               	return MZN_IDENTIFIER;
+		               }
 _[A-Za-z][A-Za-z0-9_]* {
                     	return FLATZINC_IDENTIFIER;
                     }
                     
 
-"\xE2\x88\x80"      {  	//yylval.ident = (char*) malloc(sizeof(char)*(strlen(yytext)+1));
-					   	//strcpy(yylval.ident, yytext);
-					   	return MZN_IDENTIFIER; }
-"\xE2\x88\x83"      {  	//yylval.ident = (char*) malloc(sizeof(char)*(strlen(yytext)+1));
-						//strcpy(yylval.ident, yytext);
-						return MZN_IDENTIFIER; }
+"\xE2\x88\x80"      {  	yylval.ident = new char[strlen(yytext)+1];
+                   		strcpy(yylval.ident, yytext);
+                   		return MZN_IDENTIFIER;
+                   	}
+"\xE2\x88\x83"      {  	yylval.ident = new char[strlen(yytext)+1];
+                   		strcpy(yylval.ident, yytext);
+                   		return MZN_IDENTIFIER;
+                   	}
 "\xE2\x88\x88"      { return MZN_IN; }
 "\xE2\x8A\x86"      { return MZN_SUBSET; }
 "\xE2\x8A\x87"      { return MZN_SUPERSET; }
@@ -261,7 +273,7 @@ $[A-Za-z][A-Za-z0-9_]* {
 
 void yyerror(const char* s){
 	//fprintf(stdout, "%s\n", s);
-	printf(": %s at %s\n", s, yytext);
+	printf("%d: %s at %s\n",line, s, yytext);
 }
 int yywrap()
 {
