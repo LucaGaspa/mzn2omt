@@ -1,64 +1,83 @@
 /*********************************************************************** 
  * calc.h                                                              *
  *                                                                     *
- * Copyright (C) 2015 Luca Gasparetto                                  *
- * All rights reserved.                                                *
+ * 2015 Luca Gasparetto                                                *
+ *                                                                     *
  *                                                                     *
  * This software may be modified and distributed under the terms       *
  * of the MIT license.  See the LICENSE file for details.              *
  ***********************************************************************/
 
-enum Expr_type {ATOM, EXPR, FUN};
-enum ID_type {VAR, PAR, SET};
-enum VP_type {DIM_1, DIM_2, DIM_3};
-enum Lit_type {INT, FLOAT, BOOL};
+enum VAR_TYPE {VAR, PAR, SET};
 
 
-class Expr_node;	
+class Hashtable {
+    std::unordered_map<const void *, const void *> htmap;
 
-class binSet {
-	int setDim;
-	int* values;
+public:
+    void put(const void *key, const void *value) {
+            htmap[key] = value;
+    }
+
+    const void *get(const void *key) {
+            return htmap[key];
+    }
+
 };
 
-class uValue {
-public:
-	Lit_type type;
-	union{
-		int iValue;
-		float fValue;
-		bool bValue;
-	};
+//class Node;
+class Expr;	
+
+class binSet {
+	//
+};
+
+
+class Var {
+	VAR_TYPE type;
+	std::string;
+	Vector<string> index;
+};
+
+class Fun {
+	Vector<Var> args;
+	Expr* body;
+	Expr* condition;
+
+
+};
+
+class Let {
+	Hashtable* letMap;
+	Expr* body;
+
 };
 
 class Atom {
-	ID_type type;
-	char* name;
-	VP_type dim;
-	union{
-		uValue* value;
-		binSet* set;
-	};
+	bool isFun;
+	bool isVar;
+	bool isLet;
+
+	Var* var;
+	Fun* fun;
+	Let* let;
+
 };
 
 class Expr {
-	int oper;
 	int nops;
-	Expr_node** op;
-};
+	int oper;
+	Vector<Expr> op;
 
-class Func {
-	//body
-	int body; //tmp var
-};
-
-class Expr_node {
-	Expr_type type;
-	union{
-		Atom atom;
-		Expr expr;
-		Func func;
-	};
 };
 
 
+
+//to review: Expr_node must be the sum of expr_node and ti_expr_node!
+
+class SymbolTable {
+	Hashtable* parTable;
+	Vector<binSet>* setList;
+
+
+};
