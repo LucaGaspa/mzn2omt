@@ -8,7 +8,12 @@
  * of the MIT license.  See the LICENSE file for details.              *
  ***********************************************************************/
 
+#include <unordered_map>
+#include <vector> 
+using namespace std;
+
 enum VAR_TYPE {VAR, PAR, SET};
+enum ITEM_TYPE {ATM,FUN,LET,ITE};
 
 
 class Hashtable {
@@ -33,41 +38,63 @@ class binSet {
 };
 
 
-class Var {
+class Atom {
+	//Atom is a container for everything regarding Vars, pars, sets.
+	
 	VAR_TYPE type;
-	std::string;
-	Vector<string> index;
+	string str;
+	//vector<string> index;
 };
 
 class Fun {
-	Vector<Var> args;
-	Expr* body;
-	Expr* condition;
-
+	//Fun represent call_expr element
+	
+	vector<Atom*> args;	//args
+	Expr* body;			//body (actually a free-standing parse tree)
+	Expr* condition;	//example where condition in forall
 
 };
 
 class Let {
-	Hashtable* letMap;
-	Expr* body;
+	Hashtable* letMap; //SymbolTable* let_map
+	Expr* body;			//body of the let
 
 };
 
-class Atom {
-	bool isFun;
-	bool isVar;
-	bool isLet;
+class Ite {
+	//if condition is analizable evaluates it at runtime and choose the branch
+	//else add a constraint that is equal to it
 
-	Var* var;
-	Fun* fun;
-	Let* let;
+	Expr* condition;	//condition
+	Expr* trueBranch;	//case true
+	Expr* falseBranch;	//case false
+};
+
+class Item {
+	//Item contains independent items find into expr
+
+	ITEM_TYPE type; //distinguish between types od Atoms
+
+	union{
+		Atom* atom;	//var, par, or set
+		Fun* fun;	//entire function node (ex: forall)
+		Let* let;	//entire let node
+		Ite* ite;	//if-then-else node
+	};
 
 };
 
 class Expr {
-	int nops;
-	int oper;
-	Vector<Expr> op;
+	//Expr is a node of the parsing three containing operands or a leaf (Item)
+	//Functions and Let are considered leaf because parsed by themself
+
+	int nops;	//if(nops == 1) -> it's an Item
+	int oper;	//if (isItem) -> oper not init
+	
+	union{
+		vector<Expr*> op;	//operands of the Expr
+		Item item;			//Item thought as a leaf (independently parsable item)
+	};
 
 };
 
@@ -77,7 +104,6 @@ class Expr {
 
 class SymbolTable {
 	Hashtable* parTable;
-	Vector<binSet>* setList;
-
+	//vector<binSet>* setList;
 
 };
