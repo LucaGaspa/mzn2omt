@@ -1,33 +1,31 @@
 /*********************************************************************** 
  * parser.y                                                            *
  *                                                                     *
- * Copyright (C) 2015 Luca Gasparetto                                  *
- * All rights reserved.                                                *
+ * 2015 Luca Gasparetto                                                *
+ *                                                                     *
  *                                                                     *
  * This software may be modified and distributed under the terms       *
  * of the MIT license.  See the LICENSE file for details.              *
  ***********************************************************************/
 
 %{  
-	#include <iostream>
-	#include <stdlib.h>
-	#include <stdio.h>
-	#include "calc.h"
-	void yyerror(const char *);
+	//#include <iostream>
+	//#include <cstdlib>
+  #include "calc.h"
+  void yyerror(const char *);
 	int yylex(void);
 %}
 
 %union {
-	Expr_node* expr;
-	char* ident;
-	uValue* lit;
+	char* var;
+  Expr* expr;
 }
 
 %error-verbose
 
-%token <lit> MZN_INTEGER_LITERAL "integer literal" MZN_BOOL_LITERAL "bool literal"
-%token <lit> MZN_FLOAT_LITERAL "float literal"
-%token <ident> MZN_IDENTIFIER "identifier" MZN_QUOTED_IDENTIFIER "quoted identifier" MZN_STRING_LITERAL "string literal"
+%token <var> MZN_INTEGER_LITERAL "integer literal" MZN_BOOL_LITERAL "bool literal"
+%token <var> MZN_FLOAT_LITERAL "float literal"
+%token <var> MZN_IDENTIFIER "identifier" MZN_QUOTED_IDENTIFIER "quoted identifier" MZN_STRING_LITERAL "string literal"
 %token MZN_STRING_QUOTE_START "interpolated string start" MZN_STRING_QUOTE_MID "interpolated string middle" MZN_STRING_QUOTE_END "interpolated string end"
 %token MZN_TI_IDENTIFIER "type-inst identifier" MZN_DOC_COMMENT "documentation comment" MZN_DOC_FILE_COMMENT "file-level documentation comment"
 
@@ -133,7 +131,8 @@
 %token MZN_COLONCOLON_QUOTED "'::'"
 %token MZN_PLUSPLUS_QUOTED "'++'"
 
-%type <expr> expr
+//%type <var> MZN_BOOL_LITERAL
+%type <expr> expr_atom_head
 
 %%
 
@@ -454,7 +453,12 @@ expr_atom_head :
     | '(' expr ')' array_access_tail
       { }
     | MZN_IDENTIFIER
-      { }
+      {
+        
+        $$ = new Expr($1);
+        //$$->createLiteral($1);
+        //cout << "top: " << $$->getItem()->getAtom()->getLiteral()->getID() << endl;
+      }
     | MZN_IDENTIFIER array_access_tail
       { }
     | MZN_UNDERSCORE
@@ -463,14 +467,18 @@ expr_atom_head :
       { }
     | MZN_BOOL_LITERAL
       {
-      	printf("bella: %d\n", $1->bValue);
+      	$$ = new Expr($1);
       }
     | MZN_INTEGER_LITERAL
-      { }
+      {
+        $$ = new Expr($1);
+      }
     | MZN_INFINITY
       { }
     | MZN_FLOAT_LITERAL
-      { }
+      {
+        $$ = new Expr($1);
+      }
     | string_expr
       { }
     | MZN_ABSENT
@@ -781,6 +789,7 @@ id_or_quoted_op :
 
 
 int main() {
+  //yyin -> file pointer
 	yyparse(); // yyparse automatically calls yylex to obtain tokens
 	return 0;
 }

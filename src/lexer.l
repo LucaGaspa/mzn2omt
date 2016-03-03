@@ -1,8 +1,8 @@
 /*********************************************************************** 
  * lexer.l                                                             *
  *                                                                     *
- * Copyright (C) 2015 Luca Gasparetto                                  *
- * All rights reserved.                                                *
+ * 2015 Luca Gasparetto                                                *
+ *                                                                     *
  *                                                                     *
  * This software may be modified and distributed under the terms       *
  * of the MIT license.  See the LICENSE file for details.              *
@@ -66,44 +66,42 @@
 "|]"              { return MZN_RIGHT_2D_BRACKET; }
 %[^\xa]*          { /* ignore comments */ }
 
-"true"            { yylval.lit = new uValue;
-					yylval.lit->type = BOOL;
-					yylval.lit->bValue = 1;
+"true"            { 
+					yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+					strcpy(yylval.var, yytext);
+					//free(yytext);
 					return MZN_BOOL_LITERAL; }
-"false"           { yylval.lit = new uValue;
-					yylval.lit->type = BOOL;
-					yylval.lit->bValue = 0;
-					return MZN_BOOL_LITERAL; }
-[0-9]+            {	yylval.lit = new uValue;
-					yylval.lit->type = INT;
-					yylval.lit->bValue = atoi(yytext);
-					return MZN_INTEGER_LITERAL;}
+"false"           { 
+					yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+					strcpy(yylval.var, yytext);
+					return MZN_BOOL_LITERAL; 
+				  }
+[0-9]+            {	
+					yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+					strcpy(yylval.var, yytext);
+					return MZN_INTEGER_LITERAL;
+				  }
 0x[0-9A-Fa-f]+    { //BASE 16
-					yylval.lit = new uValue;
-					yylval.lit->type = INT;
-					yylval.lit->bValue = strtol(yytext, NULL, 16);
+					yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+					strcpy(yylval.var, yytext);
 					return MZN_INTEGER_LITERAL;}
 0o[0-7]+          { //BASE 8
-					yylval.lit = new uValue;
-					yylval.lit->type = INT;
-					yylval.lit->bValue = strtol(yytext, NULL, 8);
-					return MZN_INTEGER_LITERAL;}
-[0-9]+\.[0-9]+    { yylval.lit = new uValue;
-					yylval.lit->type = FLOAT;
-					yylval.lit->bValue = atof(yytext);
-					return MZN_FLOAT_LITERAL;}
+					yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+					strcpy(yylval.var, yytext);
+					return MZN_INTEGER_LITERAL;
+				  }
+[0-9]+\.[0-9]+    { yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+					strcpy(yylval.var, yytext);
+					return MZN_FLOAT_LITERAL;
+				  }
 [0-9]+\.[0-9]+[Ee][+-]?[0-9]+  {
-                    yylval.lit = new uValue;
-					yylval.lit->type = FLOAT;
-					/*TODO::atof exp?*/
-					yylval.lit->bValue = atof(yytext);
+					yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+					strcpy(yylval.var, yytext);
 					return MZN_FLOAT_LITERAL;
                    }
 [0-9]+[Ee][+-]?[0-9]+  {
-                    yylval.lit = new uValue;
-					yylval.lit->type = FLOAT;
-					/*TODO::atof exp?*/
-					yylval.lit->bValue = atof(yytext);
+					yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+					strcpy(yylval.var, yytext);
 					return MZN_FLOAT_LITERAL;
                    }
 [:;|{},\[\]\.]    { return *yytext; }
@@ -212,22 +210,27 @@ _                 { return MZN_UNDERSCORE; }
 "'~"[+*=-]"'"	  { return MZN_IDENTIFIER; }
 
 [A-Za-z][A-Za-z0-9_]* { 
-						yylval.ident = new char[strlen(yytext)+1];
-		               	strcpy(yylval.ident, yytext);
-		               	return MZN_IDENTIFIER;
+						/// ---<
+						yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+						strcpy(yylval.var, yytext);
+						return MZN_IDENTIFIER;
 		               }
 _[A-Za-z][A-Za-z0-9_]* {
-                    	return FLATZINC_IDENTIFIER;
+                    	yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+						strcpy(yylval.var, yytext);
+						return FLATZINC_IDENTIFIER;
                     }
                     
 
-"\xE2\x88\x80"      {  	yylval.ident = new char[strlen(yytext)+1];
-                   		strcpy(yylval.ident, yytext);
-                   		return MZN_IDENTIFIER;
+"\xE2\x88\x80"      {  	/// ---<
+						yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+						strcpy(yylval.var, yytext);
+						return MZN_IDENTIFIER;
                    	}
-"\xE2\x88\x83"      {  	yylval.ident = new char[strlen(yytext)+1];
-                   		strcpy(yylval.ident, yytext);
-                   		return MZN_IDENTIFIER;
+"\xE2\x88\x83"      {  	/// ---<
+						yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+						strcpy(yylval.var, yytext);
+						return MZN_IDENTIFIER;
                    	}
 "\xE2\x88\x88"      { return MZN_IN; }
 "\xE2\x8A\x86"      { return MZN_SUBSET; }
