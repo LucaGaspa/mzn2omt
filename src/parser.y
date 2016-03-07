@@ -9,16 +9,17 @@
  ***********************************************************************/
 
 %{  
-	//#include <iostream>
-	//#include <cstdlib>
-  #include "calc.h"
+	#include "calc.h"
+  
   void yyerror(const char *);
 	int yylex(void);
 %}
 
 %union {
 	char* var;
+  //string* buff;
   Expr* expr;
+  Symbol* symbol;
 }
 
 %error-verbose
@@ -133,6 +134,7 @@
 
 //%type <var> MZN_BOOL_LITERAL
 %type <expr> expr_atom_head
+%type <symbol> base_ti_expr_tail base_ti_expr
 
 %%
 
@@ -191,7 +193,9 @@ include_item :
  
 vardecl_item :
       ti_expr_and_id annotations
-             { } 
+             {
+              //Interpreter->printSym(); Interpreter->addSymToTab():
+             } 
      | ti_expr_and_id annotations MZN_EQ expr
              { } 
  
@@ -269,7 +273,9 @@ ti_expr_and_id_or_anon :
      
 ti_expr_and_id :
       ti_expr ':' MZN_IDENTIFIER
-             { } 
+             {
+               
+             } 
  
 ti_expr_list : ti_expr_list_head comma_or_none
              { } 
@@ -284,25 +290,48 @@ ti_expr :
       base_ti_expr 
 			 { }
     | MZN_ARRAY MZN_LEFT_BRACKET ti_expr_list MZN_RIGHT_BRACKET MZN_OF base_ti_expr
-             { } 
+             {
+              //SymbolList ????? 
+             } 
      | MZN_LIST MZN_OF base_ti_expr
              { } 
  
 base_ti_expr :
       base_ti_expr_tail
-             { } 
+             {
+              $$ = $1;
+              $$->setTi_type(PAR);
+             } 
      | MZN_OPT base_ti_expr_tail
-             { } 
+             {
+              $$ = $2;
+              $$->setTi_type(PAR);
+             } 
      | MZN_PAR opt_opt base_ti_expr_tail
-             { } 
+             {
+              $$ = $3;
+              $$->setTi_type(PAR);
+             } 
      | MZN_VAR opt_opt base_ti_expr_tail
-             { } 
+             {
+              $$ = $3;
+              $$->setTi_type(VAR);
+             } 
      | opt_opt MZN_SET MZN_OF base_ti_expr_tail
-             { } 
+             {
+              $$ = $4;
+              $$->setTi_type(SETPAR);
+             } 
      | MZN_PAR opt_opt MZN_SET MZN_OF base_ti_expr_tail
-             { } 
+             {
+              $$ = $5;
+              $$->setTi_type(SETPAR);
+             } 
      | MZN_VAR opt_opt MZN_SET MZN_OF base_ti_expr_tail
-             { } 
+             {
+              $$ = $5;
+              $$->setTi_type(SETVAR);
+             } 
  
 opt_opt:
       /* nothing */
@@ -312,22 +341,36 @@ opt_opt:
 
 base_ti_expr_tail:
       MZN_INT
-      { }
+      {
+        $$ = new Symbol(INT);
+      }
     | MZN_BOOL
-      { }
+      {
+        $$ = new Symbol(FLOAT);
+      }
     | MZN_FLOAT
-      { }
+      {
+        $$ = new Symbol(BOOL);
+      }
     | MZN_STRING
-      { }
+      {
+        //NOT SUPPORTED
+      }
     | MZN_ANN
-      { } 
+      {
+        //NOT SUPPORTED
+      } 
      | set_expr
-      { }
+      {
+        //new Symbol(SET); //TODO::
+      }
     | MZN_TI_IDENTIFIER
-      { }
+      {
+        //NOT SUPPORTED
+      }
 
 expr_list : expr_list_head comma_or_none
-	  { }
+      { }
 
 expr_list_head :
       expr
@@ -456,8 +499,7 @@ expr_atom_head :
       {
         
         $$ = new Expr($1);
-        //$$->createLiteral($1);
-        //cout << "top: " << $$->getItem()->getAtom()->getLiteral()->getID() << endl;
+        cout << "top: " << $$->getItem()->getAtom()->getLiteral()->getID() << endl;
       }
     | MZN_IDENTIFIER array_access_tail
       { }

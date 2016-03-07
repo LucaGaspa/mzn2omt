@@ -1,8 +1,8 @@
 #/*********************************************************************** 
 # * Makefile                                                            *
 # *                                                                     *
-# * Copyright (C) 2015 Luca Gasparetto                                  *
-# * All rights reserved.                                                *
+# * 2015 Luca Gasparetto                                                *
+# *                                                                     *
 # *                                                                     *
 # * This software may be modified and distributed under the terms       *
 # * of the MIT license.  See the LICENSE file for details.              *
@@ -20,8 +20,8 @@ CC = g++ -w
 # calc is the final object that we will generate, it is produced by
 # the C compiler from the y.tab.o and from the lex.yy.o
 
-calc: parser.tab.o lex.yy.o
-	$(CC) -o ../bin/mzn2smt parser.tab.o lex.yy.o
+calc: parser.tab.o lex.yy.o Expr.cpp
+	$(CC) -o ../bin/mzn2smt parser.tab.o lex.yy.o expr.cpp item.cpp atom.cpp literal.cpp symbol.cpp
 
 # These dependency rules indicate that 
 # (1) lex.yy.o depends on lex.yy.c and y.tab.h
