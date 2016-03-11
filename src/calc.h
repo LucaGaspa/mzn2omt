@@ -17,9 +17,15 @@
 #include <vector> 
 #include <string>
 #include <stack>
+#include "number.h"
+#include "intervalset.h"
 
 using namespace std;
 
+template class msat::Interval<DNumber>;
+template class msat::IntervalSet<DNumber>;
+typedef msat::Interval<DNumber> IntInterval;
+typedef msat::IntervalSet<DNumber> IntIntervalSet;
 
 enum DOMAIN_TYPE{INT,FLOAT,BOOL};
 enum TI_TYPE{VAR,PAR,SETVAR,SETPAR}; //maybe useless
@@ -45,6 +51,7 @@ public:
 class Expr;	
 
 class Literal {
+	//Literal represents Var_ID,Par_ID,Int,Float,Bool (everything identified by str)
 	string* id;
 
 public:
@@ -56,13 +63,11 @@ public:
 	
 };
 
-class binSet {
-	//means IntervalSet
-};
-
 class Array {
+	//Array represents IDs with index access (es: a[1])
+	//maybe can be absorbed by Literal
 	string id;
-	std::vector<int> index; //means vector<IntervalSet*>* index;
+	//WIP:: std::vector<int> index; //means vector<IntervalSet*>* index;
 
 };
 
@@ -71,13 +76,13 @@ class Atom {
 	ATOM_TYPE type;
 	union{
 		Array* array;
-		binSet* set;
+		IntIntervalSet* set;
 		Literal* literal;
 	};
 	//vector<string> index;
 public:
 	Atom(Array* arr);
-	Atom(binSet* s);
+	Atom(IntIntervalSet* s);
 	Atom(Literal* lit);
 	~Atom();
 
@@ -85,7 +90,7 @@ public:
 };
 
 class Fun {
-	//Fun represent call_expr element
+	//Fun represents call_expr non-terminal
 	string* id; //function identifier (forall, exist, sum, ...)
 
 	vector<Atom*>* args;	//args
@@ -95,12 +100,14 @@ class Fun {
 };
 
 class Let {
+	//Let represents let_expr non-terminal
 	Hashtable* letMap;	//SymbolTable* let_map
 	Expr* body;			//body of the let
 
 };
 
 class Ite {
+	//Ite represents if_then_else_expr non-terminal
 	//if condition is analizable evaluates it at runtime and choose the branch
 	//else add a constraint that is equal to it
 
@@ -151,29 +158,33 @@ public:
 };
 
 
-//to review: ti_expr_node creates Interpreter Tables, Expr_node use this!
 
 class Symbol {
+	//symbol is initialized in declaration phase and creates ths symbol table
 	ATOM_TYPE type;		//type
 	DOMAIN_TYPE domain;	//domain
 	TI_TYPE ti_type;
-	//range:   Expr*->Item*->Atom*-> interval set
-	//vector<index*>*: interval set
+	Expr* set; 			//range:   Expr*->Item*->Atom*-> interval set
+	//WIP:: //IntIntervalSet* range; //range:   Expr*->Item*->Atom*-> interval set
+	//vector<Symbol>* index
 	//ID
 	//values
 public:		
 	Symbol(DOMAIN_TYPE dom);
-	//Symbol(Expr* set);
+	Symbol(Expr* set);
 
 	void setTi_type(TI_TYPE t);
 	void setSymbolType(ATOM_TYPE tp);
 };
 
 class SymbolTable {
+	//HashTable --> <string,class*>
 	Hashtable* table;
 };
 
 class Interpreter {
+	//Interpreter stores all symbolTables used in global and local scope
+	//moreover it prints every constraint once reduced
 	SymbolTable* globalTable;
 	stack<SymbolTable*> localTable;
 

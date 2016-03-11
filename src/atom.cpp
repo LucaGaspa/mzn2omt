@@ -15,7 +15,7 @@ Atom::Atom(Array* arr){
 	type = ARR;
 	array = arr;
 }
-Atom::Atom(binSet* s){
+Atom::Atom(IntIntervalSet* s){
 	type = SET;
 	set = s;
 }

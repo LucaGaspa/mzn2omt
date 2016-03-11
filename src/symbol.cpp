@@ -15,10 +15,14 @@ Symbol::Symbol(DOMAIN_TYPE dom){
 	//TODO:: settare il range al massimo dei valori consentiti "(-inf,+inf)"
 }
 
+Symbol::Symbol(Expr* s){
+	set = s;
+}
+
 void Symbol::setTi_type(TI_TYPE t){
 	ti_type = t;
 }
 
-void 	Symbol::setSymbolType(ATOM_TYPE tp){
+void Symbol::setSymbolType(ATOM_TYPE tp){
 	type = tp;
 }

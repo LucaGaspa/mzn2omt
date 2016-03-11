@@ -133,8 +133,8 @@
 %token MZN_PLUSPLUS_QUOTED "'++'"
 
 //%type <var> MZN_BOOL_LITERAL
-%type <expr> expr_atom_head
-%type <symbol> base_ti_expr_tail base_ti_expr
+%type <expr> expr_atom_head set_expr
+%type <symbol> base_ti_expr_tail base_ti_expr ti_expr 
 
 %%
 
@@ -288,10 +288,15 @@ ti_expr_list_head :
  
 ti_expr :
       base_ti_expr 
-			 { }
+             {
+              $$ = $1;
+             }
     | MZN_ARRAY MZN_LEFT_BRACKET ti_expr_list MZN_RIGHT_BRACKET MZN_OF base_ti_expr
              {
-              //SymbolList ????? 
+              $$ = $6;
+              //$$:Symbol->vector<Symbol>->itervalSet -->index(ti_expr_list)
+              //  |_> iter ti_expr_list: take indexes and delete
+              // es: $$->takeAndRemove($3);
              } 
      | MZN_LIST MZN_OF base_ti_expr
              { } 
@@ -363,6 +368,7 @@ base_ti_expr_tail:
      | set_expr
       {
         //new Symbol(SET); //TODO::
+        $$ = new Symbol($1);
       }
     | MZN_TI_IDENTIFIER
       {
@@ -497,7 +503,6 @@ expr_atom_head :
       { }
     | MZN_IDENTIFIER
       {
-        
         $$ = new Expr($1);
         cout << "top: " << $$->getItem()->getAtom()->getLiteral()->getID() << endl;
       }
@@ -832,6 +837,6 @@ id_or_quoted_op :
 
 int main() {
   //yyin -> file pointer
-	yyparse(); // yyparse automatically calls yylex to obtain tokens
+  yyparse(); // yyparse automatically calls yylex to obtain tokens
 	return 0;
 }
