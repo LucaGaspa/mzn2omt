@@ -15,7 +15,7 @@ YACC = bison -d
 
 # We assume that your C-compiler is called cc
 
-CC = g++ -w
+CC = g++ -w -std=c++11
 
 # calc is the final object that we will generate, it is produced by
 # the C compiler from the y.tab.o and from the lex.yy.o
