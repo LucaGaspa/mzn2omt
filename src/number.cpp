@@ -104,19 +104,19 @@ DNumber & DNumber::operator=(const DNumber &other)
     //------------------------------------
 
     DNumber & DNumber::operator+(const DNumber &other) const{
-        DNumber* tmp = new DNumber(val_ + other.val_, 1);
+        DNumber* tmp = new DNumber(val_ + other.val_, eps_ + other.eps_);
         return *tmp;
     }
     DNumber & DNumber::operator+(const int other) const{
-        DNumber* tmp = new DNumber(val_ + other, 1);
+        DNumber* tmp = new DNumber(val_ + other, eps_);
         return *tmp;
     }
     DNumber & DNumber::operator-(const DNumber &other) const{
-        DNumber* tmp = new DNumber(val_ - other.val_, 1);
+        DNumber* tmp = new DNumber(val_ - other.val_, eps_ - other.eps_);
         return *tmp;
     }
     DNumber & DNumber::operator-(const int other) const{
-        DNumber* tmp = new DNumber(val_ - other, 1);
+        DNumber* tmp = new DNumber(val_ - other, eps_);
         return *tmp;
     }
     bool DNumber::operator>(const DNumber &other) const{
