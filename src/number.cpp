@@ -79,7 +79,7 @@ DNumber & DNumber::operator=(const DNumber &other)
     
     DNumber::DNumber(int i){
         val_ = mpq_class(i, 1);
-        eps_ = mpq_class(1, 1);
+        eps_ = mpq_class(0, 1);
     }
 
     DNumber::DNumber(double d){
@@ -92,7 +92,7 @@ DNumber & DNumber::operator=(const DNumber &other)
 
     DNumber::DNumber(unsigned long l){
         val_ = mpq_class(l, 1);
-        eps_ = mpq_class(1, 1);
+        eps_ = mpq_class(0, 1);
     }
 
     DNumber::DNumber(mpq_class v,mpq_class e){
