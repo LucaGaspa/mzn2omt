@@ -120,16 +120,16 @@ DNumber & DNumber::operator=(const DNumber &other)
         return *tmp;
     }
     bool DNumber::operator>(const DNumber &other) const{
-        return val_ > other.val_;
+        return compare(*this, other) > 0;
     }
     bool DNumber::operator<(const DNumber &other) const{
-        return val_ < other.val_;
+        return compare(*this, other) < 0;
     }
     bool DNumber::operator<=(const DNumber &other) const{
-        return val_ <= other.val_;
+        return compare(*this, other) <= 0;
     }
     bool DNumber::operator ==(const DNumber &other) const{
-        return val_ == other.val_;
+        return compare(*this, other) == 0;
     }
     DNumber & DNumber::operator+=(const DNumber &other){
         if (this != &other) {
