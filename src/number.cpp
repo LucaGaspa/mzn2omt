@@ -25,6 +25,7 @@
 
 #include "number.h"
 #include <sstream>
+#include <iomanip>
 
 //-----------------------------------------------------------------------------
 // Static Members
@@ -82,8 +83,11 @@ DNumber & DNumber::operator=(const DNumber &other)
     }
 
     DNumber::DNumber(double d){
-        val_ = mpq_class(d, 1);
-        eps_ = mpq_class(1, 1);
+        std::ostringstream strs;
+        strs << std::setprecision(64) << d;
+        std::string nstr = strs.str();
+        val_.set_str(nstr, 10);
+        eps_.set_str("0", 10);
     }
 
     DNumber::DNumber(unsigned long l){
