@@ -25,6 +25,7 @@
 
 #include "number.h"
 #include <sstream>
+#include <iomanip>
 
 //-----------------------------------------------------------------------------
 // Static Members
@@ -78,17 +79,20 @@ DNumber & DNumber::operator=(const DNumber &other)
     
     DNumber::DNumber(int i){
         val_ = mpq_class(i, 1);
-        eps_ = mpq_class(1, 1);
+        eps_ = mpq_class(0, 1);
     }
 
     DNumber::DNumber(double d){
-        val_ = mpq_class(d, 1);
-        eps_ = mpq_class(1, 1);
+        std::ostringstream strs;
+        strs << std::setprecision(64) << d;
+        std::string nstr = strs.str();
+        val_.set_str(nstr, 10);
+        eps_.set_str("0", 10);
     }
 
     DNumber::DNumber(unsigned long l){
         val_ = mpq_class(l, 1);
-        eps_ = mpq_class(1, 1);
+        eps_ = mpq_class(0, 1);
     }
 
     DNumber::DNumber(mpq_class v,mpq_class e){
@@ -100,32 +104,32 @@ DNumber & DNumber::operator=(const DNumber &other)
     //------------------------------------
 
     DNumber & DNumber::operator+(const DNumber &other) const{
-        DNumber* tmp = new DNumber(val_ + other.val_, 1);
+        DNumber* tmp = new DNumber(val_ + other.val_, eps_ + other.eps_);
         return *tmp;
     }
     DNumber & DNumber::operator+(const int other) const{
-        DNumber* tmp = new DNumber(val_ + other, 1);
+        DNumber* tmp = new DNumber(val_ + other, eps_);
         return *tmp;
     }
     DNumber & DNumber::operator-(const DNumber &other) const{
-        DNumber* tmp = new DNumber(val_ - other.val_, 1);
+        DNumber* tmp = new DNumber(val_ - other.val_, eps_ - other.eps_);
         return *tmp;
     }
     DNumber & DNumber::operator-(const int other) const{
-        DNumber* tmp = new DNumber(val_ - other, 1);
+        DNumber* tmp = new DNumber(val_ - other, eps_);
         return *tmp;
     }
     bool DNumber::operator>(const DNumber &other) const{
-        return val_ > other.val_;
+        return compare(*this, other) > 0;
     }
     bool DNumber::operator<(const DNumber &other) const{
-        return val_ < other.val_;
+        return compare(*this, other) < 0;
     }
     bool DNumber::operator<=(const DNumber &other) const{
-        return val_ <= other.val_;
+        return compare(*this, other) <= 0;
     }
     bool DNumber::operator ==(const DNumber &other) const{
-        return val_ == other.val_;
+        return compare(*this, other) == 0;
     }
     DNumber & DNumber::operator+=(const DNumber &other){
         if (this != &other) {
