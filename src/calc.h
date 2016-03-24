@@ -1,7 +1,7 @@
 /*********************************************************************** 
  * calc.h                                                              *
  *                                                                     *
- * 2015 Luca Gasparetto                                                *
+ * 2016 Luca Gasparetto                                                *
  *                                                                     *
  *                                                                     *
  * This software may be modified and distributed under the terms       *
@@ -14,7 +14,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <unordered_map>
-#include <vector> 
+#include <vector>
+#include <queue> 
 #include <string>
 #include <stack>
 #include "number.h"
@@ -24,14 +25,12 @@ using namespace std;
 
 template class msat::Interval<DNumber>;
 template class msat::IntervalSet<DNumber>;
-typedef msat::Interval<DNumber> IntInterval;
-typedef msat::IntervalSet<DNumber> IntIntervalSet;
+typedef msat::Interval<DNumber> Interval;
+typedef msat::IntervalSet<DNumber> IntervalSet;
 
 enum DOMAIN_TYPE{INT,FLOAT,BOOL};
-enum TI_TYPE{VAR,PAR,SETVAR,SETPAR}; //maybe useless
+enum TI_TYPE{VAR,PAR,SETVAR,SETPAR};
 enum ATOM_TYPE{ARR,SET,LIT};
-enum ITEM_TYPE {ATM,FUN,LET,ITE};
-
 
 class Hashtable {
     std::unordered_map<const void *, const void *> htmap;
@@ -47,134 +46,113 @@ public:
 
 };
 
+class Expr_node {
+	//Container for various items. Never istantiated (Pure virtual class).
+public:
+	virtual void interpret() = 0;
+};
 
-class Expr;	
 
-class Literal {
-	//Literal represents Var_ID,Par_ID,Int,Float,Bool (everything identified by str)
-	string* id;
+class Expr: public Expr_node {
+	//Expr represents expr non-terminal. Briefly all MZN possible math operations
+	int oper;					//operator code
+	int nops;					//number of operands
+	std::vector<Expr_node*> op;	//operands
+
+public:
+	Expr();
+
+	void interpret();
+};
+
+
+class ExprList: public Expr_node {
+	//ExprList represents expr_list non-terminal and is useful also for array indexing
+	std::vector<Expr_node*>* element;
+
+public:
+	ExprList(Expr_node* el);
+
+	void interpret();
+
+	void add(Expr_node* el);
+};
+
+
+class Literal: public Expr_node {
+	//Literal represnts both IDs, (int,bool,float) literals and array IDs with index to access
+	string* id;					//ID
+	ExprList* index;			//indexs to access the array
 
 public:
 	Literal(char* lit);
-
-	~Literal();
-
-	string getID();
 	
+	void interpret();
 };
 
-class Array {
-	//Array represents IDs with index access (es: a[1])
-	//maybe can be absorbed by Literal
-	string id;
-	//WIP:: std::vector<int> index; //means vector<IntervalSet*>* index;
-
-};
-
-class Atom {
-	//Atom is a container for everything regarding Vars, pars, sets.
-	ATOM_TYPE type;
-	union{
-		Array* array;
-		IntIntervalSet* set;
-		Literal* literal;
-	};
-	//vector<string> index;
-public:
-	Atom(Array* arr);
-	Atom(IntIntervalSet* s);
-	Atom(Literal* lit);
-	~Atom();
-
-	Literal* getLiteral();
-};
-
-class Fun {
+class Fun: public Expr_node {
 	//Fun represents call_expr non-terminal
 	string* id; //function identifier (forall, exist, sum, ...)
 
-	vector<Atom*>* args;	//args
-	Expr* body;				//body (actually a free-standing parse tree)
-	Expr* condition;		//example where condition in forall
+	//maybe ExprList args; or vector<Literal*>* args;	//args
+	ExprList* args;				//args
+	Expr_node* body;			//body (actually a free-standing parse tree)
+	Expr_node* condition;		//example where condition in forall
 
+public:
+	void interpret();
 };
 
-class Let {
+class Let: public Expr_node {
 	//Let represents let_expr non-terminal
-	Hashtable* letMap;	//SymbolTable* let_map
-	Expr* body;			//body of the let
+	Hashtable* letMap;			//SymbolTable* let_map
+	Expr_node* body;			//body of the let
 
+public:
+	void interpret();
 };
 
-class Ite {
+class Ite: public Expr_node {
 	//Ite represents if_then_else_expr non-terminal
 	//if condition is analizable evaluates it at runtime and choose the branch
 	//else add a constraint that is equal to it
 
-	Expr* condition;	//condition
-	Expr* trueBranch;	//case true
-	Expr* falseBranch;	//case false
-};
+	Expr_node* condition;		//condition
+	Expr_node* trueBranch;		//case true
+	Expr_node* falseBranch;		//case false
 
-class Item {
-	//Item contains independent items find into expr
-
-	ITEM_TYPE type; //distinguish between types od Atoms
-
-	union{
-		Atom* atom;	//var, par, or set
-		Fun* fun;	//entire function node (ex: forall)
-		Let* let;	//entire let node
-		Ite* ite;	//if-then-else node
-	};
 public:
-	Item(Atom* at);
-	Item(Fun* f);
-	Item(Let* l);
-	Item(Ite* i);
-	~Item();
-
-	Atom* getAtom();
+	void interpret();
 };
-
-class Expr {
-	//Expr is a node of the parsing three containing operands or a leaf (Item)
-	//Functions and Let are considered leaf because parsed by themself
-
-	int nops;	//if(nops == 1) -> it's an Item
-	int oper;	//if (isItem) -> oper not init
-	union{
-		vector<Expr*>* op;	//operands of the Expr
-		Item* item;			//Item thought as a leaf (independently parsable item)
-	};
-public:
-	Expr(char* lit);	//create an Expr with an Item-Atom-Literal, means ID
-	Expr(int n, Item* it);
-	Expr(int n, int o, vector<Expr*>* v);
-	~Expr();
-	
-	Item* getItem();
-	
-};
-
 
 
 class Symbol {
 	//symbol is initialized in declaration phase and creates ths symbol table
-	ATOM_TYPE type;		//type
-	DOMAIN_TYPE domain;	//domain
-	TI_TYPE ti_type;
-	Expr* set; 			//range:   Expr*->Item*->Atom*-> interval set
-	//WIP:: //IntIntervalSet* range; //range:   Expr*->Item*->Atom*-> interval set
-	//vector<Symbol>* index
-	//ID
-	//values
+	ATOM_TYPE type;				//type
+	DOMAIN_TYPE domain;			//domain
+	TI_TYPE ti_type;			//VAR,PAR,VARSET,PARSET (error-checking purpose)
+	
+	IntervalSet* range;			//ID domain (INT o FLOAT)
+
+	vector<IntervalSet*>* index;	//array index must be PAR and INT
+
+	string* id;					//ID
+	ExprList* value;			//values if PAR. Literals stored in value[0]\
+
 public:		
 	Symbol(DOMAIN_TYPE dom);
-	Symbol(Expr* set);
+	Symbol(Expr_node* set);
+	~Symbol();
 
 	void setTi_type(TI_TYPE t);
 	void setSymbolType(ATOM_TYPE tp);
+	void setIdentifier(char* ident);
+
+	void importIndexes(queue<Symbol*>* ind);
+	IntervalSet* exportIndex();
+
+	string domain2str();
+	void printDecl();
 };
 
 class SymbolTable {

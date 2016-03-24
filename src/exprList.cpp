@@ -1,7 +1,7 @@
 /*********************************************************************** 
- * atom.cpp                                                            *
+ * exprList.cpp                                                        *
  *                                                                     *
- * 2015 Luca Gasparetto                                                *
+ * 2016 Luca Gasparetto                                                *
  *                                                                     *
  *                                                                     *
  * This software may be modified and distributed under the terms       *
@@ -10,31 +10,18 @@
 
 #include "calc.h"
 
-
-Atom::Atom(Array* arr){
-	type = ARR;
-	array = arr;
-}
-Atom::Atom(IntIntervalSet* s){
-	type = SET;
-	set = s;
-}
-Atom::Atom(Literal* lit){
-	type = LIT;
-	literal = lit;
-}
-Atom::~Atom(){
-	switch(type){
-		case ARR:
-			delete array;
-			break;
-		case SET:
-			delete set;
-			break;
-		case LIT:
-			delete literal;
-			break;
-	}
+ExprList::ExprList(Expr_node* el){
+	element = new std::vector<Expr_node*>();
+	element->push_back(el);
 }
 
-Literal* Atom::getLiteral(){return literal;}
+void ExprList::add(Expr_node* el){
+	element->push_back(el);
+}
+
+void ExprList::interpret(){
+	//TODO::
+	//this should never happen!
+	std::cerr << "Hey dude, this should never happen :/" << std::endl;
+	return;
+}

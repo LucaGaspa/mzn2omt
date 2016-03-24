@@ -1,7 +1,7 @@
 /*********************************************************************** 
  * literal.cpp                                                         *
  *                                                                     *
- * 2015 Luca Gasparetto                                                *
+ * 2016 Luca Gasparetto                                                *
  *                                                                     *
  *                                                                     *
  * This software may be modified and distributed under the terms       *
@@ -10,17 +10,12 @@
 
 #include "calc.h"
 
-
-//Literal::Literal(char* lit) : id(lit) { }
 Literal::Literal(char* lit){
 	id = new string(lit);
+	index = NULL;
 }
 
-Literal::~Literal(){
-	//id.clear();
-	id->clear();
+void Literal::interpret(){
+	std::cout << *id << " ";
+	return;
 }
-
-string Literal::getID(){
-	return *id;
-	}

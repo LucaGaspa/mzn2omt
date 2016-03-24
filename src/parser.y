@@ -1,7 +1,7 @@
 /*********************************************************************** 
  * parser.y                                                            *
  *                                                                     *
- * 2015 Luca Gasparetto                                                *
+ * 2016 Luca Gasparetto                                                *
  *                                                                     *
  *                                                                     *
  * This software may be modified and distributed under the terms       *
@@ -18,8 +18,10 @@
 %union {
 	char* var;
   //string* buff;
-  Expr* expr;
+  Expr_node* expr;
   Symbol* symbol;
+  //SymbolList* symbolList;
+  std::queue<Symbol*>* symbolList;
 }
 
 %error-verbose
@@ -133,8 +135,9 @@
 %token MZN_PLUSPLUS_QUOTED "'++'"
 
 //%type <var> MZN_BOOL_LITERAL
-%type <expr> expr_atom_head set_expr
-%type <symbol> base_ti_expr_tail base_ti_expr ti_expr 
+%type <expr> expr_atom_head set_expr expr expr_list expr_list_head
+%type <symbol> base_ti_expr_tail base_ti_expr ti_expr ti_expr_and_id
+%type <symbolList> ti_expr_list ti_expr_list_head
 
 %%
 
@@ -194,10 +197,15 @@ include_item :
 vardecl_item :
       ti_expr_and_id annotations
              {
-              //Interpreter->printSym(); Interpreter->addSymToTab():
+              $1->printDecl();
+              //symbolTable->add($1);
              } 
      | ti_expr_and_id annotations MZN_EQ expr
-             { } 
+             {
+              $1->printDecl();
+              //$1->setValues($4);
+              //symbolTable->add($1);
+             } 
  
 assign_item :
       MZN_IDENTIFIER MZN_EQ expr
@@ -274,7 +282,9 @@ ti_expr_and_id_or_anon :
 ti_expr_and_id :
       ti_expr ':' MZN_IDENTIFIER
              {
-               
+               $$ = $1;
+               $$->setIdentifier($3);
+               delete $3;
              } 
  
 ti_expr_list : ti_expr_list_head comma_or_none
@@ -282,9 +292,15 @@ ti_expr_list : ti_expr_list_head comma_or_none
  
 ti_expr_list_head :
       ti_expr
-             { } 
+             {
+              $$ = new queue<Symbol*>();
+              $$->push($1);
+             } 
      | ti_expr_list_head ',' ti_expr
-             { } 
+             {
+              $1->push($3);
+              $$ = $1;
+             } 
  
 ti_expr :
       base_ti_expr 
@@ -294,9 +310,8 @@ ti_expr :
     | MZN_ARRAY MZN_LEFT_BRACKET ti_expr_list MZN_RIGHT_BRACKET MZN_OF base_ti_expr
              {
               $$ = $6;
-              //$$:Symbol->vector<Symbol>->itervalSet -->index(ti_expr_list)
-              //  |_> iter ti_expr_list: take indexes and delete
-              // es: $$->takeAndRemove($3);
+              $6->importIndexes($3);
+
              } 
      | MZN_LIST MZN_OF base_ti_expr
              { } 
@@ -367,8 +382,7 @@ base_ti_expr_tail:
       } 
      | set_expr
       {
-        //new Symbol(SET); //TODO::
-        $$ = new Symbol($1);
+        //$$ = new Symbol($1); --> take (IntervalSet) index from $1 to $$
       }
     | MZN_TI_IDENTIFIER
       {
@@ -380,9 +394,14 @@ expr_list : expr_list_head comma_or_none
 
 expr_list_head :
       expr
-      { }
+      {
+        $$ = new ExprList($1);
+      }
     | expr_list_head ',' expr
-      { }
+      {
+        $$ = $1;
+        ((ExprList*)($$))->add($3);
+      }
 
 ///
 
@@ -428,7 +447,9 @@ set_expr :
 
 expr :
       expr_atom_head
-      { }
+      {
+        $$ = $1;
+      }
     | expr MZN_COLONCOLON expr_atom_head
       { }
     | expr MZN_EQUIV expr
@@ -503,28 +524,36 @@ expr_atom_head :
       { }
     | MZN_IDENTIFIER
       {
-        $$ = new Expr($1);
-        cout << "top: " << $$->getItem()->getAtom()->getLiteral()->getID() << endl;
+        $$ = new Literal($1);
+        delete $1;
+        $$->interpret();
       }
     | MZN_IDENTIFIER array_access_tail
-      { }
+      {
+        $$ = new Literal($1);
+        delete $1;
+        //$$->setAccessIndex($2);
+      }
     | MZN_UNDERSCORE
       { }
     | MZN_UNDERSCORE array_access_tail
       { }
     | MZN_BOOL_LITERAL
       {
-      	$$ = new Expr($1);
+      	$$ = new Literal($1);
+        delete $1;
       }
     | MZN_INTEGER_LITERAL
       {
-        $$ = new Expr($1);
+        $$ = new Literal($1);
+        delete $1;
       }
     | MZN_INFINITY
       { }
     | MZN_FLOAT_LITERAL
       {
-        $$ = new Expr($1);
+        $$ = new Literal($1);
+        delete $1;
       }
     | string_expr
       { }
@@ -583,7 +612,9 @@ set_literal :
       '{' '}'
       { }
     | '{' expr_list '}'
-      { }
+      {
+        //$$ = new Set($1) --> evaluate expr and create an IntervalSet
+      }
 
 set_comp :
       '{' expr '|' comp_tail '}'
