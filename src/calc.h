@@ -18,6 +18,7 @@
 #include <queue> 
 #include <string>
 #include <stack>
+#include <stdarg.h> 
 #include "number.h"
 #include "intervalset.h"
 
@@ -57,11 +58,11 @@ class Expr: public Expr_node {
 	//Expr represents expr non-terminal. Briefly all MZN possible math operations
 	int oper;					//operator code
 	int nops;					//number of operands
-	std::vector<Expr_node*> op;	//operands
+	std::vector<Expr_node*>* op;	//operands
 
 public:
-	Expr();
-
+	Expr(int oper, int nops, ...);
+	
 	void interpret();
 };
 

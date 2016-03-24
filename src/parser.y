@@ -10,6 +10,7 @@
 
 %{  
 	#include "calc.h"
+
   
   void yyerror(const char *);
 	int yylex(void);
@@ -453,69 +454,134 @@ expr :
     | expr MZN_COLONCOLON expr_atom_head
       { }
     | expr MZN_EQUIV expr
-      { }
+      {
+        $$ = new Expr(MZN_EQUIV,2,$1,$3);
+      }
     | expr MZN_IMPL expr
-      { }
+      {
+        $$ = new Expr(MZN_IMPL,2,$1,$3);
+      }
     | expr MZN_RIMPL expr
-      { }
+      {
+        $$ = new Expr(MZN_RIMPL,2,$1,$3);
+      }
     | expr MZN_OR expr
-      { }
+      {
+        $$ = new Expr(MZN_OR,2,$1,$3);
+      }
     | expr MZN_XOR expr
-      { }
+      {
+        $$ = new Expr(MZN_XOR,2,$1,$3);
+      }
     | expr MZN_AND expr
-      { }
+      {
+        $$ = new Expr(MZN_AND,2,$1,$3);
+      }
     | expr MZN_LE expr
-      { }
+      {
+        $$ = new Expr(MZN_LE,2,$1,$3);
+      }
     | expr MZN_GR expr
-      { }
+      {
+        $$ = new Expr(MZN_GR,2,$1,$3);
+      }
     | expr MZN_LQ expr
-      { }
+      {
+        $$ = new Expr(MZN_LQ,2,$1,$3);
+      }
     | expr MZN_GQ expr
-      { }
+      {
+        $$ = new Expr(MZN_GQ,2,$1,$3);
+      }
     | expr MZN_EQ expr
-      { }
+      {
+        $$ = new Expr(MZN_EQ,2,$1,$3);
+      }
     | expr MZN_NQ expr
-      { }
+      {
+        $$ = new Expr(MZN_NQ,2,$1,$3);
+      }
     | expr MZN_IN expr
-      { }
+      {
+        $$ = new Expr(MZN_IN,2,$1,$3);
+      }
     | expr MZN_SUBSET expr
-      { }
+      {
+        $$ = new Expr(MZN_SUBSET,2,$1,$3);
+      }
     | expr MZN_SUPERSET expr
-      { }
+      {
+        $$ = new Expr(MZN_SUPERSET,2,$1,$3);
+      }
     | expr MZN_UNION expr
-      { }
+      {
+        $$ = new Expr(MZN_UNION,2,$1,$3);
+      }
     | expr MZN_DIFF expr
-      { }
+      {
+        $$ = new Expr(MZN_DIFF,2,$1,$3);
+      }
     | expr MZN_SYMDIFF expr
-      { }
+      {
+        $$ = new Expr(MZN_SYMDIFF,2,$1,$3);
+      }
     | expr MZN_DOTDOT expr
-      { }
+      {
+        $$ = new Expr(MZN_DOTDOT,2,$1,$3);
+      }
     | MZN_DOTDOT_QUOTED '(' expr ',' expr ')'
-      { }
+      {
+        //NOT SUPPORTED
+      }
     | expr MZN_INTERSECT expr
-      { }
+      {
+        $$ = new Expr(MZN_INTERSECT,2,$1,$3);
+      }
     | expr MZN_PLUSPLUS expr
-      { }
+      {
+        $$ = new Expr(MZN_PLUSPLUS,2,$1,$3);
+      }
     | expr MZN_PLUS expr
-      { }
+      {
+        $$ = new Expr(MZN_PLUS,2,$1,$3);
+        $$->interpret();
+      }
     | expr MZN_MINUS expr
-      { }
+      {
+        $$ = new Expr(MZN_MINUS,2,$1,$3);
+      }
     | expr MZN_MULT expr
-      { }
+      {
+        $$ = new Expr(MZN_MULT,2,$1,$3);
+      }
     | expr MZN_DIV expr
-      { }
+      {
+        $$ = new Expr(MZN_DIV,2,$1,$3);
+      }
     | expr MZN_IDIV expr
-      { }
+      {
+        $$ = new Expr(MZN_IDIV,2,$1,$3);
+      }
     | expr MZN_MOD expr
-      { }
+      {
+        $$ = new Expr(MZN_MOD,2,$1,$3);
+      }
     | expr MZN_QUOTED_IDENTIFIER expr
-      { }
+      {
+        //NOT SUPPORTED
+      }
     | MZN_NOT expr %prec MZN_NOT
-      { }
+      {
+        $$ = new Expr(MZN_NOT,1,$2);
+      }
     | MZN_PLUS expr %prec MZN_NOT
-      { }
+      {
+        $$ = new Expr(MZN_PLUS,1,$2);
+      }
     | MZN_MINUS expr %prec MZN_NOT
-      { }
+      {
+        $$ = new Expr(MZN_MINUS,1,$2);
+      }
 
 expr_atom_head :
       '(' expr ')'
