@@ -16,6 +16,11 @@ Literal::Literal(char* lit){
 }
 
 void Literal::interpret(){
-	std::cout << *id << " ";
+	std::cout << *id;
 	return;
+}
+
+//eval --> search in table then ret *id or tableID->val
+string Literal::eval(){
+	return *id;
 }

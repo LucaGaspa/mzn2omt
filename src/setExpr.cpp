@@ -1,5 +1,5 @@
 /*********************************************************************** 
- * exprList.cpp                                                        *
+ * setExpr.cpp                                                         *
  *                                                                     *
  * 2016 Luca Gasparetto                                                *
  *                                                                     *
@@ -10,22 +10,26 @@
 
 #include "calc.h"
 
-ExprList::ExprList(Expr_node* el){
-	element = new std::vector<Expr_node*>();
-	element->push_back(el);
+Set::Set(Expr_node* a, Expr_node* b){
+	string lb = a->eval();
+	string ub = b->eval();
+
+	Interval s = Interval(lb,ub);
+	set = new IntervalSet(s);
 }
 
-void ExprList::add(Expr_node* el){
-	element->push_back(el);
+IntervalSet* Set::exportRange(){
+	IntervalSet* tmp = this->set;
+	this->set = NULL;
+	delete this;
+	return tmp;
 }
 
-void ExprList::interpret(){
-	//TODO::
-	//this should never happen!
-	std::cerr << "Hey dude, this should never happen :/" << std::endl;
+void Set::interpret(){
+	std::cout << *set << endl;
 	return;
 }
 
-string ExprList::eval(){
-	return "Hey dude, this should never happen : exprList.cpp";
+string Set::eval(){
+	return "";
 }

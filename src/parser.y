@@ -11,6 +11,7 @@
 %{  
 	#include "calc.h"
 
+  SymbolTable* symbolTable;
   
   void yyerror(const char *);
 	int yylex(void);
@@ -18,10 +19,8 @@
 
 %union {
 	char* var;
-  //string* buff;
   Expr_node* expr;
   Symbol* symbol;
-  //SymbolList* symbolList;
   std::queue<Symbol*>* symbolList;
 }
 
@@ -214,7 +213,11 @@ assign_item :
  
 constraint_item :
       MZN_CONSTRAINT expr
-             { } 
+             {
+              std::cout << "(assert ";
+              $2->interpret();
+              std::cout << ")" << endl;
+             } 
  
 solve_item :
       MZN_SOLVE annotations MZN_SATISFY
@@ -383,7 +386,8 @@ base_ti_expr_tail:
       } 
      | set_expr
       {
-        //$$ = new Symbol($1); --> take (IntervalSet) index from $1 to $$
+        $$ = new Symbol(INT);
+        $$->setRange($1);
       }
     | MZN_TI_IDENTIFIER
       {
@@ -408,7 +412,9 @@ expr_list_head :
 
 set_expr :
       expr_atom_head
-      { }
+      {
+        //$$ = new Set($1);
+      }
     | set_expr MZN_COLONCOLON expr_atom_head
       { }
     | set_expr MZN_UNION set_expr
@@ -418,7 +424,9 @@ set_expr :
     | set_expr MZN_SYMDIFF set_expr
       { }
     | set_expr MZN_DOTDOT set_expr
-      { }
+      {
+        $$ = new Set($1,$3);
+      }
     | MZN_DOTDOT_QUOTED '(' expr ',' expr ')'
       { }
     | set_expr MZN_INTERSECT set_expr
@@ -544,7 +552,6 @@ expr :
     | expr MZN_PLUS expr
       {
         $$ = new Expr(MZN_PLUS,2,$1,$3);
-        $$->interpret();
       }
     | expr MZN_MINUS expr
       {
@@ -585,14 +592,17 @@ expr :
 
 expr_atom_head :
       '(' expr ')'
-      { }
+      {
+        $$ = $2;
+      }
     | '(' expr ')' array_access_tail
-      { }
+      {
+        //NOT SUPPORTED
+      }
     | MZN_IDENTIFIER
       {
         $$ = new Literal($1);
         delete $1;
-        $$->interpret();
       }
     | MZN_IDENTIFIER array_access_tail
       {
@@ -933,6 +943,7 @@ id_or_quoted_op :
 
 
 int main() {
+  symbolTable = new SymbolTable();
   //yyin -> file pointer
   yyparse(); // yyparse automatically calls yylex to obtain tokens
 	return 0;

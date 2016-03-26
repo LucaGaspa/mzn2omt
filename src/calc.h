@@ -32,6 +32,7 @@ typedef msat::IntervalSet<DNumber> IntervalSet;
 enum DOMAIN_TYPE{INT,FLOAT,BOOL};
 enum TI_TYPE{VAR,PAR,SETVAR,SETPAR};
 enum ATOM_TYPE{ARR,SET,LIT};
+enum EXPR_DOMAIN{INTINT,FLOATINT,INTFLOAT,FLOATFLOAT,BOOLBOOL};
 
 class Hashtable {
     std::unordered_map<const void *, const void *> htmap;
@@ -51,6 +52,7 @@ class Expr_node {
 	//Container for various items. Never istantiated (Pure virtual class).
 public:
 	virtual void interpret() = 0;
+	virtual string eval() = 0;
 };
 
 
@@ -64,6 +66,7 @@ public:
 	Expr(int oper, int nops, ...);
 	
 	void interpret();
+	string eval();
 };
 
 
@@ -75,6 +78,7 @@ public:
 	ExprList(Expr_node* el);
 
 	void interpret();
+	string eval();
 
 	void add(Expr_node* el);
 };
@@ -89,6 +93,18 @@ public:
 	Literal(char* lit);
 	
 	void interpret();
+	string eval();
+};
+
+class Set: public Expr_node {
+	IntervalSet* set;
+
+public:
+	Set(Expr_node* a, Expr_node* b);
+
+	IntervalSet* exportRange();
+	void interpret();
+	string eval();
 };
 
 class Fun: public Expr_node {
@@ -102,6 +118,7 @@ class Fun: public Expr_node {
 
 public:
 	void interpret();
+	string eval();
 };
 
 class Let: public Expr_node {
@@ -111,6 +128,7 @@ class Let: public Expr_node {
 
 public:
 	void interpret();
+	string eval();
 };
 
 class Ite: public Expr_node {
@@ -124,6 +142,7 @@ class Ite: public Expr_node {
 
 public:
 	void interpret();
+	string eval();
 };
 
 
@@ -142,9 +161,10 @@ class Symbol {
 
 public:		
 	Symbol(DOMAIN_TYPE dom);
-	Symbol(Expr_node* set);
+	//Symbol(Expr_node* set);
 	~Symbol();
 
+	void setRange(Expr_node* set);
 	void setTi_type(TI_TYPE t);
 	void setSymbolType(ATOM_TYPE tp);
 	void setIdentifier(char* ident);
@@ -157,17 +177,17 @@ public:
 };
 
 class SymbolTable {
-	//HashTable --> <string,class*>
-	Hashtable* table;
-};
-
-class Interpreter {
-	//Interpreter stores all symbolTables used in global and local scope
-	//moreover it prints every constraint once reduced
+	//SymbolTable stores all symbolTables used in global and local scope
 	SymbolTable* globalTable;
 	stack<SymbolTable*> localTable;
 
-	//printConstraint(Expr* expr);
+public:
+	SymbolTable();
+	//string getLocalVal() -> search value in the table stack and return its strval
+	DOMAIN_TYPE strDomain(string s);
+	EXPR_DOMAIN exprDomain(string s,string t);
 };
+
+extern SymbolTable* symbolTable;
 
 #endif

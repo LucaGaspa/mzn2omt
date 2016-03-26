@@ -15,15 +15,15 @@ Symbol::Symbol(DOMAIN_TYPE dom){
 	//TODO:: settare il range al massimo dei valori consentiti "(-inf,+inf)" o (-10kk, 10kk)
 	//range = new IntervalSet(-inf,+inf);
 	index = NULL;
+	range = NULL;
 }
 
-Symbol::Symbol(Expr_node* set){
+void Symbol::setRange(Expr_node* set){
 	//create IntervalSet* range from set
 
 	//needed in set_expr: conversion from Expr_node*(ARR_INDEX) to Symbol
 	//something like:
-	//range = this->Expr_nodeToSet(set)
-	//which domain?? INT or FLOAT??? --> try if(string.find('.')){domain = FLOAT}
+	this->range = ((Set*)(set))->exportRange();
 }
 
 Symbol::~Symbol(){
@@ -58,15 +58,10 @@ void Symbol::importIndexes(std::queue<Symbol*>* list){
 }
 
 IntervalSet* Symbol::exportIndex(){
-	if(this->index->size() == 1){
-		IntervalSet* tmp = this->index->front();
-		this->index = NULL;
-		delete this;
-		return tmp;	
-	}else{
-		std::cerr << "export single index, but there are more than one :(" << std::endl;
-	}
-	
+	IntervalSet* tmp = this->range;
+	this->range = NULL;
+	delete this;
+	return tmp;
 }
 
 string Symbol::domain2str(){
@@ -84,6 +79,58 @@ string Symbol::domain2str(){
 }
 
 void Symbol::printDecl(){
-	std::cout << "(declare-fun "<< *id << " () "<< domain2str() <<" )"<< std::endl;
+	if(index == NULL){
+		std::cout << "(declare-fun "<< *id << " () "<< domain2str() <<" )"<< std::endl;
+	}else{
+		if(index->size() == 1){
+			//iterator di IntervalSet
+			//TODO:: here
+			std::cout << "(declare-ARRAY "<< *id << " () "<< domain2str() <<" )"<< std::endl;
+		}
+	}
 	//if range != -inf,+inf -> print domain
+	//if range != NULL id faster
 }
+
+
+
+//===================================================================//
+//SymbolTable
+//===================================================================//
+
+
+SymbolTable::SymbolTable(){
+	return;
+}
+
+DOMAIN_TYPE SymbolTable::strDomain(string s){
+	if(s.compare("true") == 0 || s.compare("false") == 0){
+		return BOOL;
+	}
+	if((s.find(".") != std::string::npos)){
+		return FLOAT;
+	}
+	return INT;
+}
+
+EXPR_DOMAIN SymbolTable::exprDomain(string s, string t){
+	if((s.compare("true") == 0 || s.compare("false") == 0) &&
+				(t.compare("true") == 0 || t.compare("false") == 0)){
+		return BOOLBOOL;
+	}
+	if((s.find(".") != std::string::npos)){
+		if(t.find(".") != std::string::npos){
+			return FLOATFLOAT;
+		}else{
+			return FLOATINT;
+		}
+	}else{
+		if(t.find(".") != std::string::npos){
+			return INTFLOAT;
+		}else{
+			return INTINT;
+		}
+	}
+	return INTINT;
+}
+
