@@ -218,10 +218,10 @@ void Expr::interpret(){
 }
 
 //eval -> elaborate values and return their strval
-string Expr::eval(){
-	string op1 = op->at(0)->eval();
-	string op2 = op->at(1)->eval();
-	stringstream res;
+Literal* Expr::eval(){
+	Literal* op1 = op->at(0)->eval();
+	Literal* op2 = op->at(1)->eval();
+	Literal* res;
 	switch(oper){
 		case MZN_EQUIV:
 			
@@ -302,43 +302,22 @@ string Expr::eval(){
 			break;
 
 		case MZN_PLUS:
-			switch(symbolTable->exprDomain(op1,op2)) {
-				case INTINT:
-					res << (atoi(op1.c_str()) + atoi(op2.c_str()));
-					return res.str();
-					break;
-				case FLOATINT:
-					res << (atof(op1.c_str()) + atoi(op2.c_str()));
-					return res.str();
-					break;
-				case INTFLOAT:
-					res << (atoi(op1.c_str()) + atof(op2.c_str()));
-					return res.str();
-					break;
-				case FLOATFLOAT:
-					res << (atof(op1.c_str()) + atof(op2.c_str()));
-					return res.str();
-					break;
-				case BOOLBOOL:
-					//res << (atoi(op1.c_str()) + atoi(op2.c_str()));
-					//return res.str();
-					break;
-			}
+			res = &(*op1 + *op2);
 			break;
 		case MZN_MINUS:
-			
+			//res = &(*op1 - *op2);
 			break;
 		case MZN_MULT:
-			
+			//res = &(*op1 * *op2);
 			break;
 		case MZN_DIV:
-			
+			//res = &(*op1 / *op2);
 			break;
 		case MZN_IDIV:
-			
+			//res = &(*op1 / *op2);
 			break;
 		case MZN_MOD:
-			
+			//res = &(*op1 % *op2);
 			break;
 
 		case MZN_QUOTED_IDENTIFIER:
@@ -347,7 +326,8 @@ string Expr::eval(){
 			break;
 
 		case MZN_NOT:
-			
+			//res = &(!*op1);
 			break;
 	}
+	return res;
 }

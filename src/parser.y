@@ -552,6 +552,8 @@ expr :
     | expr MZN_PLUS expr
       {
         $$ = new Expr(MZN_PLUS,2,$1,$3);
+        //Literal* r = $$->eval();
+        //std::cout << "plus eval: " << r->toString() << std::endl;
       }
     | expr MZN_MINUS expr
       {
@@ -601,12 +603,12 @@ expr_atom_head :
       }
     | MZN_IDENTIFIER
       {
-        $$ = new Literal($1);
+        $$ = new Literal(ID,$1);
         delete $1;
       }
     | MZN_IDENTIFIER array_access_tail
       {
-        $$ = new Literal($1);
+        $$ = new Literal(ID,$1);
         delete $1;
         //$$->setAccessIndex($2);
       }
@@ -616,19 +618,19 @@ expr_atom_head :
       { }
     | MZN_BOOL_LITERAL
       {
-      	$$ = new Literal($1);
+      	$$ = new Literal(BOOL,$1);
         delete $1;
       }
     | MZN_INTEGER_LITERAL
       {
-        $$ = new Literal($1);
+        $$ = new Literal(INT,$1);
         delete $1;
       }
     | MZN_INFINITY
       { }
     | MZN_FLOAT_LITERAL
       {
-        $$ = new Literal($1);
+        $$ = new Literal(FLOAT,$1);
         delete $1;
       }
     | string_expr

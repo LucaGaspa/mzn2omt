@@ -26,6 +26,7 @@ void ExprList::interpret(){
 	return;
 }
 
-string ExprList::eval(){
-	return "Hey dude, this should never happen : exprList.cpp";
+Literal* ExprList::eval(){
+	cerr << "Hey dude, this should never happen : exprList.cpp";
+	return NULL;
 }

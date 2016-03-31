@@ -103,6 +103,7 @@ SymbolTable::SymbolTable(){
 	return;
 }
 
+/*
 DOMAIN_TYPE SymbolTable::strDomain(string s){
 	if(s.compare("true") == 0 || s.compare("false") == 0){
 		return BOOL;
@@ -133,4 +134,4 @@ EXPR_DOMAIN SymbolTable::exprDomain(string s, string t){
 	}
 	return INTINT;
 }
-
+*/

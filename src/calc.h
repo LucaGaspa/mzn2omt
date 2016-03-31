@@ -29,7 +29,7 @@ template class msat::IntervalSet<DNumber>;
 typedef msat::Interval<DNumber> Interval;
 typedef msat::IntervalSet<DNumber> IntervalSet;
 
-enum DOMAIN_TYPE{INT,FLOAT,BOOL};
+enum DOMAIN_TYPE{INT,FLOAT,BOOL,ID};
 enum TI_TYPE{VAR,PAR,SETVAR,SETPAR};
 enum ATOM_TYPE{ARR,SET,LIT};
 enum EXPR_DOMAIN{INTINT,FLOATINT,INTFLOAT,FLOATFLOAT,BOOLBOOL};
@@ -48,11 +48,13 @@ public:
 
 };
 
+class Literal;
+
 class Expr_node {
 	//Container for various items. Never istantiated (Pure virtual class).
 public:
 	virtual void interpret() = 0;
-	virtual string eval() = 0;
+	virtual Literal* eval() = 0;
 };
 
 
@@ -66,7 +68,7 @@ public:
 	Expr(int oper, int nops, ...);
 	
 	void interpret();
-	string eval();
+	Literal* eval();
 };
 
 
@@ -78,7 +80,7 @@ public:
 	ExprList(Expr_node* el);
 
 	void interpret();
-	string eval();
+	Literal* eval();
 
 	void add(Expr_node* el);
 };
@@ -86,14 +88,20 @@ public:
 
 class Literal: public Expr_node {
 	//Literal represnts both IDs, (int,bool,float) literals and array IDs with index to access
+	DOMAIN_TYPE domain;			//domain of literal
 	string* id;					//ID
 	ExprList* index;			//indexs to access the array
 
 public:
-	Literal(char* lit);
+	Literal(DOMAIN_TYPE d, const char* lit);
 	
+	Literal& operator +(const Literal& other) const;
+
 	void interpret();
-	string eval();
+	Literal* eval();
+
+	string toString() const;
+	DOMAIN_TYPE getDomain() const;
 };
 
 class Set: public Expr_node {
@@ -104,7 +112,7 @@ public:
 
 	IntervalSet* exportRange();
 	void interpret();
-	string eval();
+	Literal* eval();
 };
 
 class Fun: public Expr_node {
@@ -118,7 +126,7 @@ class Fun: public Expr_node {
 
 public:
 	void interpret();
-	string eval();
+	Literal* eval();
 };
 
 class Let: public Expr_node {
@@ -128,7 +136,7 @@ class Let: public Expr_node {
 
 public:
 	void interpret();
-	string eval();
+	Literal* eval();
 };
 
 class Ite: public Expr_node {
@@ -142,7 +150,7 @@ class Ite: public Expr_node {
 
 public:
 	void interpret();
-	string eval();
+	Literal* eval();
 };
 
 
@@ -184,8 +192,10 @@ class SymbolTable {
 public:
 	SymbolTable();
 	//string getLocalVal() -> search value in the table stack and return its strval
-	DOMAIN_TYPE strDomain(string s);
-	EXPR_DOMAIN exprDomain(string s,string t);
+	
+	//Temporary stuff:
+	//DOMAIN_TYPE strDomain(string s);
+	//EXPR_DOMAIN exprDomain(string s,string t);
 };
 
 extern SymbolTable* symbolTable;

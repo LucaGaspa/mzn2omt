@@ -11,10 +11,10 @@
 #include "calc.h"
 
 Set::Set(Expr_node* a, Expr_node* b){
-	string lb = a->eval();
-	string ub = b->eval();
+	Literal* lb = a->eval();
+	Literal* ub = b->eval();
 
-	Interval s = Interval(lb,ub);
+	Interval s = Interval(lb->toString(),ub->toString());
 	set = new IntervalSet(s);
 }
 
@@ -30,6 +30,7 @@ void Set::interpret(){
 	return;
 }
 
-string Set::eval(){
-	return "";
+Literal* Set::eval(){
+	std::cerr << "Wrong way: SetExpr.cpp" << std::endl;
+	return NULL;
 }

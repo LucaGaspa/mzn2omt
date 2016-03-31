@@ -10,7 +10,10 @@
 
 #include "calc.h"
 
-Literal::Literal(char* lit){
+#include "literal_operators.h"
+
+Literal::Literal(DOMAIN_TYPE d, const char* lit){
+	domain = d;
 	id = new string(lit);
 	index = NULL;
 }
@@ -21,6 +24,13 @@ void Literal::interpret(){
 }
 
 //eval --> search in table then ret *id or tableID->val
-string Literal::eval(){
+Literal* Literal::eval(){
+	return this;
+}
+
+DOMAIN_TYPE Literal::getDomain() const{
+	return domain;
+}
+string Literal::toString() const{
 	return *id;
 }
