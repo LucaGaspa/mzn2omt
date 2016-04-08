@@ -10,8 +10,6 @@
 
 %{  
 	#include "calc.h"
-
-  SymbolTable* symbolTable;
   
   void yyerror(const char *);
 	int yylex(void);
@@ -197,14 +195,15 @@ include_item :
 vardecl_item :
       ti_expr_and_id annotations
              {
-              $1->printDecl();
+              $1->printDecl(); //if VAR printDecl, else NO
               //symbolTable->add($1);
              } 
      | ti_expr_and_id annotations MZN_EQ expr
              {
-              $1->printDecl();
+              $1->printDecl(); //TODO::if VAT printDecl, else NO
               //$1->setValues($4);
-              //symbolTable->add($1);
+              SymbolTable::getInstance().globalInsert($1);
+              SymbolTable::getInstance().setValue($1, $4);
              } 
  
 assign_item :
@@ -945,8 +944,9 @@ id_or_quoted_op :
 
 
 int main() {
-  symbolTable = new SymbolTable();
+  
   //yyin -> file pointer
   yyparse(); // yyparse automatically calls yylex to obtain tokens
+
 	return 0;
 }

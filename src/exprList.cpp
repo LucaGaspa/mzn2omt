@@ -27,6 +27,8 @@ void ExprList::interpret(){
 }
 
 Literal* ExprList::eval(){
-	cerr << "Hey dude, this should never happen : exprList.cpp";
-	return NULL;
+	//cerr << "Hey dude, this should never happen : exprList.cpp";
+	
+	//should be called only when searching a symbol in the symboltable
+	return element->front()->eval();
 }

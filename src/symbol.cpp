@@ -16,6 +16,12 @@ Symbol::Symbol(DOMAIN_TYPE dom){
 	//range = new IntervalSet(-inf,+inf);
 	index = NULL;
 	range = NULL;
+	value = NULL;
+}
+
+Symbol::~Symbol(){
+	//TODO::
+	return;
 }
 
 void Symbol::setRange(Expr_node* set){
@@ -26,21 +32,21 @@ void Symbol::setRange(Expr_node* set){
 	this->range = ((Set*)(set))->exportRange();
 }
 
-Symbol::~Symbol(){
-	//TODO::
-	return;
+void Symbol::setValue(Expr_node* expr){
+	if(dynamic_cast<ExprList*>(expr)){
+		value = (ExprList*)expr;
+	}else{
+		value = new ExprList(expr);
+	}
 }
 
-void Symbol::setTi_type(TI_TYPE t){
-	ti_type = t;
-}
-
-void Symbol::setSymbolType(ATOM_TYPE tp){
-	type = tp;
-}
-
-void Symbol::setIdentifier(char* ident){
-	id = new std::string(ident);
+Literal* Symbol::getValue(){
+	if(value != NULL){
+		return value->eval();
+	}else{
+		return new Literal(domain, id->c_str());
+	}
+	
 }
 
 void Symbol::importIndexes(std::queue<Symbol*>* list){
@@ -98,40 +104,24 @@ void Symbol::printDecl(){
 //SymbolTable
 //===================================================================//
 
-
 SymbolTable::SymbolTable(){
-	return;
+	globalTable = new HashTable();
+	localTable = new std::vector<HashTable*>();
 }
 
-/*
-DOMAIN_TYPE SymbolTable::strDomain(string s){
-	if(s.compare("true") == 0 || s.compare("false") == 0){
-		return BOOL;
-	}
-	if((s.find(".") != std::string::npos)){
-		return FLOAT;
-	}
-	return INT;
+void SymbolTable::setValue(Symbol* symbol, Expr_node* expr){
+	globalTable->get(symbol->getID())->setValue(expr);
 }
 
-EXPR_DOMAIN SymbolTable::exprDomain(string s, string t){
-	if((s.compare("true") == 0 || s.compare("false") == 0) &&
-				(t.compare("true") == 0 || t.compare("false") == 0)){
-		return BOOLBOOL;
-	}
-	if((s.find(".") != std::string::npos)){
-		if(t.find(".") != std::string::npos){
-			return FLOATFLOAT;
-		}else{
-			return FLOATINT;
-		}
-	}else{
-		if(t.find(".") != std::string::npos){
-			return INTFLOAT;
-		}else{
-			return INTINT;
-		}
-	}
-	return INTINT;
+void SymbolTable::globalInsert(std::string key, Symbol* value){
+	globalTable->insert(key, value);
 }
-*/
+
+void SymbolTable::globalInsert(Symbol* symbol){
+	globalTable->insert(symbol->getID(), symbol);	
+}
+
+Symbol* SymbolTable::get(std::string key){
+	//TODO:: consider local environments
+	return globalTable->get(key);
+}

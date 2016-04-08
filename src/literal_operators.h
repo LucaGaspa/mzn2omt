@@ -9,18 +9,31 @@
  ***********************************************************************/
 
 Literal& Literal::operator +(const Literal & other) const {
-	Literal* res;
+	Literal* res = NULL;
 	stringstream tmp;
 
-	const Literal* op1 = this;
-	const Literal* op2 = &other;
+	//const Literal* op1 = this;
+	//const Literal* op2 = &other;
+
+	SymbolTable* table = &SymbolTable::getInstance();
+	Literal* op1;
+	Literal* op2;
 
 	if(domain == ID){
-		//search in table
-		//store val | ret NULL
-		//new op1
+		Symbol* swapper = table->get(this->toString());
+		if(!swapper){
+			std::cerr << "plus evaluation error with ID recovering\n";
+			exit(0);
+		}else{
+			op1 = swapper->getValue();
+			std::cout << op1->toString() << std::endl;
+		}
+	}else{
+		op1 = new Literal(domain, toString().c_str());
 	}
+
 	if(other.getDomain() == ID){
+		//TODO::
 		//search in table
 		//store val | ret NULL	
 		//new op2

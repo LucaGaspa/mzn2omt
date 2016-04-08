@@ -19,12 +19,26 @@ Literal::Literal(DOMAIN_TYPE d, const char* lit){
 }
 
 void Literal::interpret(){
-	std::cout << *id;
+	SymbolTable* table = &SymbolTable::getInstance();
+	Symbol* sym = table->get(toString());
+	if(sym != NULL){
+		Literal* tmp = sym->getValue();
+		std::cout << tmp->toString();
+	}else{
+		std::cout << *id;
+	}
 	return;
 }
 
 //eval --> search in table then ret *id or tableID->val
 Literal* Literal::eval(){
+	/*SymbolTable* table = &SymbolTable::getInstance();
+	Symbol* sym = table->get(toString());
+	if(sym != NULL){
+		return sym->getValue();
+	}else{
+		return this;
+	}//*/
 	return this;
 }
 

@@ -34,19 +34,6 @@ enum TI_TYPE{VAR,PAR,SETVAR,SETPAR};
 enum ATOM_TYPE{ARR,SET,LIT};
 enum EXPR_DOMAIN{INTINT,FLOATINT,INTFLOAT,FLOATFLOAT,BOOLBOOL};
 
-class Hashtable {
-    std::unordered_map<const void *, const void *> htmap;
-
-public:
-    void put(const void *key, const void *value) {
-            htmap[key] = value;
-    }
-
-    const void *get(const void *key) {
-            return htmap[key];
-    }
-
-};
 
 class Literal;
 
@@ -131,7 +118,7 @@ public:
 
 class Let: public Expr_node {
 	//Let represents let_expr non-terminal
-	Hashtable* letMap;			//SymbolTable* let_map
+	//Hashtable* letMap;			//SymbolTable* let_map
 	Expr_node* body;			//body of the let
 
 public:
@@ -155,7 +142,7 @@ public:
 
 
 class Symbol {
-	//symbol is initialized in declaration phase and creates ths symbol table
+	//symbols are initialized in declaration phase and create the symbol table
 	ATOM_TYPE type;				//type
 	DOMAIN_TYPE domain;			//domain
 	TI_TYPE ti_type;			//VAR,PAR,VARSET,PARSET (error-checking purpose)
@@ -173,9 +160,15 @@ public:
 	~Symbol();
 
 	void setRange(Expr_node* set);
-	void setTi_type(TI_TYPE t);
-	void setSymbolType(ATOM_TYPE tp);
-	void setIdentifier(char* ident);
+	inline void setTi_type(TI_TYPE t){ti_type = t;};
+	inline void setSymbolType(ATOM_TYPE tp){type = tp;};
+	inline void setIdentifier(char* ident){id = new std::string(ident);};
+	void setValue(Expr_node* expr);
+
+	inline DOMAIN_TYPE getDomain(){return domain;};
+	inline string getID(){return *id;};
+
+	Literal* getValue();
 
 	void importIndexes(queue<Symbol*>* ind);
 	IntervalSet* exportIndex();
@@ -184,20 +177,52 @@ public:
 	void printDecl();
 };
 
-class SymbolTable {
-	//SymbolTable stores all symbolTables used in global and local scope
-	SymbolTable* globalTable;
-	stack<SymbolTable*> localTable;
+class HashTable {
+	//human readable class for unordered_map usage
+    std::unordered_map<std::string, Symbol*> htmap;
 
 public:
-	SymbolTable();
-	//string getLocalVal() -> search value in the table stack and return its strval
-	
-	//Temporary stuff:
-	//DOMAIN_TYPE strDomain(string s);
-	//EXPR_DOMAIN exprDomain(string s,string t);
-};
+	HashTable(){};
 
-extern SymbolTable* symbolTable;
+    inline void insert(std::string key, Symbol* value) {htmap[key] = value;}
+
+    inline Symbol* get(std::string key) {return htmap[key];}
+
+};//*/
+
+class SymbolTable
+{
+	//Singleton paradigm
+    public:
+        static SymbolTable & getInstance()
+        {
+            static SymbolTable instance;			// Guaranteed to be destroyed.
+            										// Instantiated on first use.
+            return instance;
+        }
+    private:
+        HashTable* globalTable;					//table for global variables
+        std::vector<HashTable*>* localTable;	//vector for each local table
+
+        //Singleton methods
+        SymbolTable();
+    
+        //SymbolTable(SymbolTable const&);			// Don't Implement
+        //void operator=(SymbolTable const&);		// Don't implement
+
+        // C++ 11
+        // =======
+		//deleting the methods we don't want.
+    public:
+        SymbolTable(SymbolTable const&) = delete;
+        void operator=(SymbolTable const&) = delete;
+
+        //Methods
+        void setValue(Symbol* symbol, Expr_node* expr);
+
+        void globalInsert(std::string key, Symbol* value);
+        void globalInsert(Symbol* symbol);
+        Symbol* get(string key);
+};
 
 #endif
