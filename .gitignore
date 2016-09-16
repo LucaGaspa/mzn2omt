@@ -1,0 +1,8 @@
+bin
+lex.yy.c
+lex.yy.o
+parser.output
+parser.tab.c
+parser.tab.h
+parser.tab.o
+k
