@@ -30,15 +30,11 @@ void Literal::interpret(){
 	return;
 }
 
-//eval --> search in table then ret *id or tableID->val
 Literal* Literal::eval(){
-	/*SymbolTable* table = &SymbolTable::getInstance();
-	Symbol* sym = table->get(toString());
-	if(sym != NULL){
-		return sym->getValue();
-	}else{
-		return this;
-	}//*/
+	Symbol* tmp = SymbolTable::getInstance().get(*(this->id));
+	if(tmp != NULL){
+		return tmp->getValue();
+	}
 	return this;
 }
 

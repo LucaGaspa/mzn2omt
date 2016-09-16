@@ -302,7 +302,7 @@ Literal* Expr::eval(){
 			break;
 
 		case MZN_PLUS:
-			res = &(*op1 + *op2);
+			res = &(*op1 + *op2); //TODO:: review syntax
 			break;
 		case MZN_MINUS:
 			//res = &(*op1 - *op2);

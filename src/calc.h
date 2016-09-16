@@ -19,8 +19,8 @@
 #include <string>
 #include <stack>
 #include <stdarg.h> 
-#include "number.h"
-#include "intervalset.h"
+#include "intervalSetLib/number.h"
+#include "intervalSetLib/intervalset.h"
 
 using namespace std;
 
@@ -95,6 +95,7 @@ class Set: public Expr_node {
 	IntervalSet* set;
 
 public:
+	Set(Expr_node* a);
 	Set(Expr_node* a, Expr_node* b);
 
 	IntervalSet* exportRange();
@@ -174,6 +175,9 @@ public:
 	IntervalSet* exportIndex();
 
 	string domain2str();
+	string printName(string name,DNumber i,DNumber j,DNumber k);
+	void decideName(string name,DNumber i,DNumber j,DNumber k);
+	void printRange(string name,DNumber i,DNumber j,DNumber k, IntervalSet* range);
 	void printDecl();
 };
 
@@ -210,9 +214,6 @@ class SymbolTable
         //SymbolTable(SymbolTable const&);			// Don't Implement
         //void operator=(SymbolTable const&);		// Don't implement
 
-        // C++ 11
-        // =======
-		//deleting the methods we don't want.
     public:
         SymbolTable(SymbolTable const&) = delete;
         void operator=(SymbolTable const&) = delete;
@@ -222,6 +223,7 @@ class SymbolTable
 
         void globalInsert(std::string key, Symbol* value);
         void globalInsert(Symbol* symbol);
+        void globalInsert(Symbol* symbol, Expr_node* expr);
         Symbol* get(string key);
 };
 

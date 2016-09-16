@@ -15,13 +15,13 @@ YACC = bison -d
 
 # We assume that your C-compiler is called cc
 
-CC = g++ -w -std=c++11
+CC = g++ -g -w -std=c++11
 
 # calc is the final object that we will generate, it is produced by
 # the C compiler from the y.tab.o and from the lex.yy.o
 
 calc: parser.tab.o lex.yy.o
-	$(CC) -lgmp -o ../bin/mzn2smt parser.tab.o lex.yy.o number.cpp literal.cpp exprList.cpp expr.cpp setExpr.cpp symbol.cpp 
+	$(CC) -lgmp -o ../bin/mzn2smt parser.tab.o lex.yy.o intervalSetLib/number.cpp literal.cpp exprList.cpp expr.cpp setExpr.cpp symbol.cpp 
 
 # These dependency rules indicate that 
 # (1) lex.yy.o depends on lex.yy.c and y.tab.h

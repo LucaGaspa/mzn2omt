@@ -26,11 +26,11 @@
 #ifndef INTERVAL_H_INCLUDED
 #define INTERVAL_H_INCLUDED
 
-#include <algorithm>
-#include <vector>
-#include <assert.h>
-#include <iostream>
-#include <sstream>
+#include<algorithm>
+#include<vector>
+#include<assert.h>
+#include<iostream>
+#include<sstream>
 
 namespace msat {
 
@@ -69,11 +69,11 @@ public:
     const_iterator begin() const;
     const_iterator end() const;
 
+    std::string to_str() const;
+
 private:
     T lower_;
     T upper_;
-
-    std::string to_str() const;
 
     template <class U>
     friend bool operator==(const Interval<U> &ival, const Interval<U> &other);
@@ -119,7 +119,7 @@ private:
 
 template <class T>
 Interval<T>::Interval()
-    : lower_(0,1), upper_(-1,1)
+    : lower_(0), upper_(-1)
 {
     // nothing to do
 };

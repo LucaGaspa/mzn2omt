@@ -9,11 +9,11 @@
  ***********************************************************************/
 
 %{
-	#include "calc.h"
-	#include "parser.tab.h"
-	#include <cstring>
-	
-	int line = 1;
+    #include "calc.h"
+    #include "parser.tab.h"
+    #include <cstring>
+    
+    int line = 1;
 %}
 
 %x string
@@ -27,35 +27,35 @@
 %%
 
 <*>\x0              {
-						return MZN_INVALID_NULL;
-					}
+                        return MZN_INVALID_NULL;
+                    }
 
-\xa               	{
-						line++;
-                  	}
-[ \f\xd\t]         	{/* ignore whitespace */}
+\xa                 {
+                        line++;
+                    }
+[ \f\xd\t]          {/* ignore whitespace */}
 
-"/**"             	{}
+"/**"               {}
 <doccomment>{
-  "*/"            	{}
-  [^*\xa]+       	{line++;}
-  "*"             	{}
+  "*/"              {}
+  [^*\xa]+          {line++;}
+  "*"               {}
   \xa               {line++;}
 }
 
-"/***"             	{}
+"/***"              {}
 <doccomment_file>{
-  "*/"            	{return MZN_DOC_FILE_COMMENT; }
-  [^*\xa]+       	{line++;}
-  "*"             	{}
-  \xa              	{}
+  "*/"              {return MZN_DOC_FILE_COMMENT; }
+  [^*\xa]+          {line++;}
+  "*"               {}
+  \xa               {}
 }
 
-"/*"              	{}
+"/*"                {}
 <multilinecomment>{
-  "*/"            	{}
-  [^*\xa]+       	{line++;}
-  "*"             	{}
+  "*/"              {}
+  [^*\xa]+          {line++;}
+  "*"               {}
   \xa               {line++;}
 }
 
@@ -67,42 +67,42 @@
 %[^\xa]*          { /* ignore comments */ }
 
 "true"            { 
-					yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
-					strcpy(yylval.var, yytext);
-					//free(yytext);
-					return MZN_BOOL_LITERAL; }
+                    yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+                    strcpy(yylval.var, yytext);
+                    //free(yytext);
+                    return MZN_BOOL_LITERAL; }
 "false"           { 
-					yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
-					strcpy(yylval.var, yytext);
-					return MZN_BOOL_LITERAL; 
-				  }
-[0-9]+            {	
-					yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
-					strcpy(yylval.var, yytext);
-					return MZN_INTEGER_LITERAL;
-				  }
+                    yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+                    strcpy(yylval.var, yytext);
+                    return MZN_BOOL_LITERAL; 
+                  }
+[0-9]+            { 
+                    yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+                    strcpy(yylval.var, yytext);
+                    return MZN_INTEGER_LITERAL;
+                  }
 0x[0-9A-Fa-f]+    { //BASE 16
-					yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
-					strcpy(yylval.var, yytext);
-					return MZN_INTEGER_LITERAL;}
+                    yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+                    strcpy(yylval.var, yytext);
+                    return MZN_INTEGER_LITERAL;}
 0o[0-7]+          { //BASE 8
-					yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
-					strcpy(yylval.var, yytext);
-					return MZN_INTEGER_LITERAL;
-				  }
+                    yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+                    strcpy(yylval.var, yytext);
+                    return MZN_INTEGER_LITERAL;
+                  }
 [0-9]+\.[0-9]+    { yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
-					strcpy(yylval.var, yytext);
-					return MZN_FLOAT_LITERAL;
-				  }
+                    strcpy(yylval.var, yytext);
+                    return MZN_FLOAT_LITERAL;
+                  }
 [0-9]+\.[0-9]+[Ee][+-]?[0-9]+  {
-					yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
-					strcpy(yylval.var, yytext);
-					return MZN_FLOAT_LITERAL;
+                    yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+                    strcpy(yylval.var, yytext);
+                    return MZN_FLOAT_LITERAL;
                    }
 [0-9]+[Ee][+-]?[0-9]+  {
-					yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
-					strcpy(yylval.var, yytext);
-					return MZN_FLOAT_LITERAL;
+                    yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+                    strcpy(yylval.var, yytext);
+                    return MZN_FLOAT_LITERAL;
                    }
 [:;|{},\[\]\.]    { return *yytext; }
 \.\.              { return MZN_DOTDOT; }
@@ -207,31 +207,31 @@ _                 { return MZN_UNDERSCORE; }
 "'/\\'"           { return MZN_AND_QUOTED; }
 
 "~"[+*=-]         { return MZN_QUOTED_IDENTIFIER; }
-"'~"[+*=-]"'"	  { return MZN_IDENTIFIER; }
+"'~"[+*=-]"'"     { return MZN_IDENTIFIER; }
 
 [A-Za-z][A-Za-z0-9_]* { 
-						/// ---<
-						yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
-						strcpy(yylval.var, yytext);
-						return MZN_IDENTIFIER;
-		               }
+                        /// ---<
+                        yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+                        strcpy(yylval.var, yytext);
+                        return MZN_IDENTIFIER;
+                       }
 _[A-Za-z][A-Za-z0-9_]* {
-                    	yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
-						strcpy(yylval.var, yytext);
-						return FLATZINC_IDENTIFIER;
+                        yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+                        strcpy(yylval.var, yytext);
+                        return FLATZINC_IDENTIFIER;
                     }
                     
 
-"\xE2\x88\x80"      {  	/// ---<
-						yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
-						strcpy(yylval.var, yytext);
-						return MZN_IDENTIFIER;
-                   	}
-"\xE2\x88\x83"      {  	/// ---<
-						yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
-						strcpy(yylval.var, yytext);
-						return MZN_IDENTIFIER;
-                   	}
+"\xE2\x88\x80"      {   /// ---<
+                        yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+                        strcpy(yylval.var, yytext);
+                        return MZN_IDENTIFIER;
+                    }
+"\xE2\x88\x83"      {   /// ---<
+                        yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+                        strcpy(yylval.var, yytext);
+                        return MZN_IDENTIFIER;
+                    }
 "\xE2\x88\x88"      { return MZN_IN; }
 "\xE2\x8A\x86"      { return MZN_SUBSET; }
 "\xE2\x8A\x87"      { return MZN_SUPERSET; }
@@ -248,37 +248,38 @@ _[A-Za-z][A-Za-z0-9_]* {
 "\xE2\x88\xAA"      { return MZN_UNION; }
 "\xE2\x88\xA9"      { return MZN_INTERSECT; }
 
-$[A-Za-z][A-Za-z0-9_]* {
-                    return MZN_TI_IDENTIFIER; }
+$[A-Za-z][A-Za-z0-9_]*                  {return MZN_TI_IDENTIFIER; }
 
-"(" {  return *yytext; }
-<bracket_exp>")" {  return *yytext; }
-<quoted_exp>")" { }
+"("                                     {return *yytext; }
+<bracket_exp>")"                        {return *yytext; }
+<quoted_exp>")"                         { }
+
+\"(\\.|[^"])*\"                         {return MZN_STRING_LITERAL;}
 
 \"                {}
-<string,string_quote>[^\\"\xa\xd\x0]* {}
-<string,string_quote>\\n         {}
-<string,string_quote>\\t         {}
-<string,string_quote>\\[\\']     {}
-<string,string_quote>\\[\\"]     {}
-<string>\\"("       { return MZN_STRING_QUOTE_START; }
-<string_quote>\\"(" { return MZN_STRING_QUOTE_MID;}
-<string>\"          { return MZN_STRING_LITERAL; }
-<string_quote>\"          { return MZN_STRING_QUOTE_END; }
-<string,string_quote>. {  return (unsigned char)yytext[0]; }
-<string,string_quote><<EOF>> {  return MZN_UNTERMINATED_STRING; }
+<string,string_quote>[^\\"\xa\xd\x0]*   {}
+<string,string_quote>\\n                {}
+<string,string_quote>\\t                {}
+<string,string_quote>\\[\\']            {}
+<string,string_quote>\\[\\"]            {}
+<string>\\"("                           {return MZN_STRING_QUOTE_START; }
+<string_quote>\\"("                     {return MZN_STRING_QUOTE_MID;}
+<string>\"                              {return MZN_STRING_LITERAL; }
+<string_quote>\"                        {return MZN_STRING_QUOTE_END; }
+<string,string_quote>.                  {return (unsigned char)yytext[0]; }
+<string,string_quote><<EOF>>            {return MZN_UNTERMINATED_STRING; }
 
-`[A-Za-z][A-Za-z0-9_]*` {return MZN_QUOTED_IDENTIFIER; }
-.                 { return (unsigned char)yytext[0]; }
+`[A-Za-z][A-Za-z0-9_]*`                 {return MZN_QUOTED_IDENTIFIER; }
+.                                       {return (unsigned char)yytext[0]; }
 
 
 %%
 
 void yyerror(const char* s){
-	//fprintf(stdout, "%s\n", s);
-	printf("%d: %s at %s\n",line, s, yytext);
+    //fprintf(stdout, "%s\n", s);
+    printf("%d: %s at %s\n",line, s, yytext);
 }
 int yywrap()
 {
-	return 1;
+    return 1;
 }

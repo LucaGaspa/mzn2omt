@@ -28,11 +28,11 @@
 
 #include "interval.h"
 
-#include <algorithm>
-#include <vector>
-#include <assert.h>
-#include <iostream>
-#include <sstream>
+#include<algorithm>
+#include<vector>
+#include<assert.h>
+#include<iostream>
+#include<sstream>
 
 namespace msat {
 
@@ -90,11 +90,11 @@ public:
     const_subset_iterator subset_begin() const;
     const_subset_iterator subset_end() const;
 
+    std::string to_str() const;
+
 private:
     std::vector< Interval<T> > ivals_;
     Interval<T> empty_;
-
-    std::string to_str() const;
 
     template <class U>
     friend IntervalSet<U> set_symdiff(const IntervalSet<U> &iset, const IntervalSet<U> &other);

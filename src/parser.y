@@ -9,14 +9,14 @@
  ***********************************************************************/
 
 %{  
-	#include "calc.h"
+    #include "calc.h"
   
   void yyerror(const char *);
-	int yylex(void);
+    int yylex(void);
 %}
 
 %union {
-	char* var;
+    char* var;
   Expr_node* expr;
   Symbol* symbol;
   std::queue<Symbol*>* symbolList;
@@ -175,6 +175,7 @@ item_tail :
      | vardecl_item
              { } 
      | assign_item
+             { }
      | constraint_item
              { } 
      | solve_item
@@ -195,15 +196,13 @@ include_item :
 vardecl_item :
       ti_expr_and_id annotations
              {
+              SymbolTable::getInstance().globalInsert($1);
               $1->printDecl(); //if VAR printDecl, else NO
-              //symbolTable->add($1);
              } 
      | ti_expr_and_id annotations MZN_EQ expr
              {
-              $1->printDecl(); //TODO::if VAT printDecl, else NO
-              //$1->setValues($4);
-              SymbolTable::getInstance().globalInsert($1);
-              SymbolTable::getInstance().setValue($1, $4);
+              SymbolTable::getInstance().globalInsert($1,$4);
+              $1->printDecl(); //TODO::if VAR printDecl, else NO
              } 
  
 assign_item :
@@ -212,11 +211,15 @@ assign_item :
  
 constraint_item :
       MZN_CONSTRAINT expr
-             {
-              std::cout << "(assert ";
-              $2->interpret();
-              std::cout << ")" << endl;
-             } 
+            {
+                if($2 != NULL){
+                    std::cout << "(assert ";
+                    $2->interpret();
+                    std::cout << ")" << endl;
+                }else{
+                    printf("warning: constraint not implemented! - parser.y\n");
+                }
+            } 
  
 solve_item :
       MZN_SOLVE annotations MZN_SATISFY
@@ -291,7 +294,9 @@ ti_expr_and_id :
              } 
  
 ti_expr_list : ti_expr_list_head comma_or_none
-             { } 
+             {
+              $$ = $1;
+             } 
  
 ti_expr_list_head :
       ti_expr
@@ -412,7 +417,7 @@ expr_list_head :
 set_expr :
       expr_atom_head
       {
-        //$$ = new Set($1);
+        $$ = $1;
       }
     | set_expr MZN_COLONCOLON expr_atom_head
       { }
@@ -617,7 +622,7 @@ expr_atom_head :
       { }
     | MZN_BOOL_LITERAL
       {
-      	$$ = new Literal(BOOL,$1);
+        $$ = new Literal(BOOL,$1);
         delete $1;
       }
     | MZN_INTEGER_LITERAL
@@ -663,7 +668,7 @@ expr_atom_head :
     | let_expr
       { }
     | call_expr
-      { }
+      { $$ = NULL;}
     | call_expr array_access_tail
       { }
 
@@ -948,5 +953,5 @@ int main() {
   //yyin -> file pointer
   yyparse(); // yyparse automatically calls yylex to obtain tokens
 
-	return 0;
+    return 0;
 }
