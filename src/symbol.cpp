@@ -92,7 +92,15 @@ void Symbol::decideName(string name,DNumber i,DNumber j,DNumber k){
     std::cout << "(declare-fun "<< printName(name,i,j,k) << " () "<< domain2str() <<" )"<< std::endl;
 }
 
-void Symbol::printRange(string name,DNumber i,DNumber j,DNumber k, IntervalSet* range){
+void Symbol::printRange(string name, bool isArray, DNumber i,DNumber j,DNumber k, IntervalSet* range){
+    if(! isArray){
+        if(range == NULL){
+            std::cout << "(assert (and (>= " << name << " 10000000) (<= " << name << " 10000000)))" << std::endl;
+        }else{
+            std::cout << "(assert (and (>= " << name << " " << (*range).lower().to_str() << ") (<= " << name << " " << (*range).upper().to_str() << ")))" << std::endl;
+        }
+        return;
+    }
     if(range != NULL){
         std::cout << "(assert (or ";
         //optimization: if(not fragmented): NO 'or' AND NO 'for' needed
@@ -114,13 +122,14 @@ void Symbol::printDecl(){
 
     if(index == NULL){
         std::cout << "(declare-fun "<< *id << " () "<< domain2str() <<" )"<< std::endl;
+        printRange(*id,false,0,0,0,range);
     }else{
         switch(this->index->size()){
             case 1:
                 //TODO:: think about fragmented index intervals: maybe if(isFragmented){ret ERROR} ??
                 for (IntervalSet::value_iterator it = ((*index)[0])->value_begin(), end = ((*index)[0])->value_end(); it != end; ++it) {
                     decideName(*id,*it,0,0);
-                    printRange(*id,*it,0,0,range);
+                    printRange(*id,true,*it,0,0,range);
                 }
                 break;
             case 2:
@@ -130,7 +139,7 @@ void Symbol::printDecl(){
                     for (IntervalSet::value_iterator itt = ((*index)[1])->value_begin(), end_2 = ((*index)[1])->value_end();
             itt != end_2; ++itt) {
                         decideName(*id,*it,*itt,0);
-                        printRange(*id,*it,0,0,range);
+                        printRange(*id,true,*it,0,0,range);
                     }
                 }
                 break;

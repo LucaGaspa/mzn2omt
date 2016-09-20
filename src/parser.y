@@ -197,12 +197,12 @@ vardecl_item :
       ti_expr_and_id annotations
              {
               SymbolTable::getInstance().globalInsert($1);
-              $1->printDecl(); //if VAR printDecl, else NO
+              $1->printDecl();
              } 
      | ti_expr_and_id annotations MZN_EQ expr
              {
               SymbolTable::getInstance().globalInsert($1,$4);
-              $1->printDecl(); //TODO::if VAR printDecl, else NO
+              $1->printDecl();
              } 
  
 assign_item :
@@ -374,11 +374,11 @@ base_ti_expr_tail:
       }
     | MZN_BOOL
       {
-        $$ = new Symbol(FLOAT);
+        $$ = new Symbol(BOOL);
       }
     | MZN_FLOAT
       {
-        $$ = new Symbol(BOOL);
+        $$ = new Symbol(FLOAT);
       }
     | MZN_STRING
       {
@@ -390,7 +390,7 @@ base_ti_expr_tail:
       } 
      | set_expr
       {
-        $$ = new Symbol(INT);
+        $$ = new Symbol(INT); //TODO:: Init Set with correct domain and use it. INT = HARDCODING
         $$->setRange($1);
       }
     | MZN_TI_IDENTIFIER
@@ -399,7 +399,9 @@ base_ti_expr_tail:
       }
 
 expr_list : expr_list_head comma_or_none
-      { }
+      {
+        $$ = $1;
+      }
 
 expr_list_head :
       expr
@@ -420,41 +422,73 @@ set_expr :
         $$ = $1;
       }
     | set_expr MZN_COLONCOLON expr_atom_head
-      { }
+      {
+        //NOT SUPPORTED
+      }
     | set_expr MZN_UNION set_expr
-      { } 
+      {
+        //TODO::
+      } 
      | set_expr MZN_DIFF set_expr
-      { }
+      {
+        //TODO::
+      }
     | set_expr MZN_SYMDIFF set_expr
-      { }
+      {
+        //TODO::
+      }
     | set_expr MZN_DOTDOT set_expr
       {
         $$ = new Set($1,$3);
       }
     | MZN_DOTDOT_QUOTED '(' expr ',' expr ')'
-      { }
+      {
+        //NOT SUPPORTED
+      }
     | set_expr MZN_INTERSECT set_expr
-      { }
+      {
+        //TODO::
+      }
     | set_expr MZN_PLUSPLUS set_expr
-      { }
+      {
+        //TODO::
+      }
     | set_expr MZN_PLUS set_expr
-      { }
+      {
+        //TODO::
+      }
     | set_expr MZN_MINUS set_expr
-      { }
+      {
+        //TODO::
+      }
     | set_expr MZN_MULT set_expr
-      { }
+      {
+        //TODO::
+      }
     | set_expr MZN_DIV set_expr
-      { }
+      {
+        //TODO::
+      }
     | set_expr MZN_IDIV set_expr
-      { }
+      {
+        //TODO::
+      }
     | set_expr MZN_MOD set_expr
-      { }
+      {
+        //TODO::
+      }
     | set_expr MZN_QUOTED_IDENTIFIER set_expr
-      { }
+      {
+        //NOT SUPPORTED
+      }
     | MZN_PLUS set_expr %prec MZN_NOT
-      { }
+      {
+        //TODO::
+      }
     | MZN_MINUS set_expr %prec MZN_NOT
-      { }
+      {
+        //TODO::
+      }
 
 ///
 
@@ -464,7 +498,9 @@ expr :
         $$ = $1;
       }
     | expr MZN_COLONCOLON expr_atom_head
-      { }
+      {
+        //NOT SUPPORTED
+      }
     | expr MZN_EQUIV expr
       {
         $$ = new Expr(MZN_EQUIV,2,$1,$3);
@@ -556,8 +592,6 @@ expr :
     | expr MZN_PLUS expr
       {
         $$ = new Expr(MZN_PLUS,2,$1,$3);
-        //Literal* r = $$->eval();
-        //std::cout << "plus eval: " << r->toString() << std::endl;
       }
     | expr MZN_MINUS expr
       {
@@ -617,9 +651,13 @@ expr_atom_head :
         //$$->setAccessIndex($2);
       }
     | MZN_UNDERSCORE
-      { }
+      {
+        //TODO::
+      }
     | MZN_UNDERSCORE array_access_tail
-      { }
+      {
+        //TODO::
+      }
     | MZN_BOOL_LITERAL
       {
         $$ = new Literal(BOOL,$1);
@@ -631,68 +669,70 @@ expr_atom_head :
         delete $1;
       }
     | MZN_INFINITY
-      { }
+      {
+        //TODO::
+      }
     | MZN_FLOAT_LITERAL
       {
         $$ = new Literal(FLOAT,$1);
         delete $1;
       }
     | string_expr
-      { }
+      { /*nothing to do*/ }
     | MZN_ABSENT
-      { }
+      { /* NOT SUPPORTED */}
     | set_literal
-      { }
+      { /* TODO:: */ }
     | set_literal array_access_tail
-      { }
+      { /* TODO:: */ }
     | set_comp
-      { }
+      { /* TODO:: */ }
     | set_comp array_access_tail
-      { }
+      { /* TODO:: */ }
     | simple_array_literal
-      { }
+      { /* TODO:: */ }
     | simple_array_literal array_access_tail
-      { }
+      { /* TODO:: */ }
     | simple_array_literal_2d
-      { }
+      { /* TODO:: */ }
     | simple_array_literal_2d array_access_tail
-      { }
+      { /* TODO:: */ }
     | simple_array_comp
-      { }
+      { /* TODO:: */ }
     | simple_array_comp array_access_tail
-      { }
+      { /* TODO:: */ }
     | if_then_else_expr
-      { }
+      { /* TODO:: */ }
     | if_then_else_expr array_access_tail
-      { }
+      { /* NOT SUPPORTED */ }
     | let_expr
-      { }
+      { /* TODO:: */ }
     | call_expr
-      { $$ = NULL;}
+      { $$ = NULL;/* -->debug purpose, TODO:: */}
     | call_expr array_access_tail
-      { }
+      { /* NOT SUPPORTED */}
 
 string_expr:
       MZN_STRING_LITERAL
-      { }
+      { /* nothing to do */ }
     | MZN_STRING_QUOTE_START string_quote_rest
-      { }
+      { /* nothing to do */ }
 
 string_quote_rest:
       expr_list_head MZN_STRING_QUOTE_END
-      { }
+      { /* nothing to do */ }
     | expr_list_head MZN_STRING_QUOTE_MID string_quote_rest
-      { }
+      { /* nothing to do */ }
 
 array_access_tail :
       MZN_LEFT_BRACKET expr_list MZN_RIGHT_BRACKET
-      { }
+      { /* TODO:: */ }
     | array_access_tail MZN_LEFT_BRACKET expr_list MZN_RIGHT_BRACKET
-      { }
+      { /* TODO:: */ }
 
 set_literal :
       '{' '}'
-      { }
+      { /* TODO:: */ }
     | '{' expr_list '}'
       {
         //$$ = new Set($1) --> evaluate expr and create an IntervalSet
@@ -700,76 +740,80 @@ set_literal :
 
 set_comp :
       '{' expr '|' comp_tail '}'
-      { }
+      { /* TODO:: */ }
 
 comp_tail :
       generator_list
-      { }
+      { /* TODO:: */ }
     | generator_list MZN_WHERE expr
-      { }
+      { /* TODO:: */ }
 
-generator_list : generator_list_head comma_or_none
+generator_list : 
+      generator_list_head comma_or_none
+      { /* TODO:: */ }
 
 generator_list_head :
       generator
-      { }
+      { /* TODO:: */ }
     | generator_list_head ',' generator
-      { }
+      { /* TODO:: */ }
 
 generator : 
       id_list MZN_IN expr
-      { }
+      { /* TODO:: */ }
 
-id_list : id_list_head comma_or_none
+id_list : 
+      id_list_head comma_or_none
+      { /* TODO:: */ }
 
 id_list_head :
       MZN_IDENTIFIER
-      { }
+      { /* TODO:: */ }
     | id_list_head ',' MZN_IDENTIFIER
-      { }
+      { /* TODO:: */ }
 
 simple_array_literal : 
       MZN_LEFT_BRACKET MZN_RIGHT_BRACKET
-      { }
+      { /* TODO:: */ }
     | MZN_LEFT_BRACKET expr_list MZN_RIGHT_BRACKET
-      { }
+      { /* TODO:: */ }
 
 simple_array_literal_2d :
       MZN_LEFT_2D_BRACKET MZN_RIGHT_2D_BRACKET
-      { }
+      { /* TODO:: */ }
     | MZN_LEFT_2D_BRACKET simple_array_literal_2d_list MZN_RIGHT_2D_BRACKET
-      { }
+      { /* TODO:: */ }
     | MZN_LEFT_2D_BRACKET simple_array_literal_2d_list '|' MZN_RIGHT_2D_BRACKET
-      { }
+      { /* TODO:: */ }
     | MZN_LEFT_2D_BRACKET simple_array_literal_3d_list MZN_RIGHT_2D_BRACKET
-      { }
+      { /* TODO:: */ }
 
 simple_array_literal_3d_list :
       '|' '|'
-      { }
+      { /* TODO:: */ }
     | '|' simple_array_literal_2d_list '|'
-      { }
+      { /* TODO:: */ }
     | simple_array_literal_3d_list ',' '|' simple_array_literal_2d_list '|'
-      { } 
+      { /* TODO:: */ } 
 
 simple_array_literal_2d_list :
       expr_list
-      { }
+      { /* TODO:: */ }
     | simple_array_literal_2d_list '|' expr_list
-      { }
+      { /* TODO:: */ }
 
 simple_array_comp :
       MZN_LEFT_BRACKET expr '|' comp_tail MZN_RIGHT_BRACKET
-      { }
+      { /* TODO:: */ }
 
 if_then_else_expr :
       MZN_IF expr MZN_THEN expr elseif_list MZN_ELSE expr MZN_ENDIF
-      { }
+      { /* TODO:: */ }
 
 elseif_list :
-      { }
+      { /* NOT SUPPORTED */ }
     | elseif_list MZN_ELSEIF expr MZN_THEN expr
-      { }
+      { /* NOT SUPPORTED */ }
 
 quoted_op :
       MZN_EQUIV_QUOTED
@@ -835,43 +879,43 @@ quoted_op_call :
 
 call_expr :
       MZN_IDENTIFIER '(' ')'
-      { }
+      { /* TODO:: */ }
     | quoted_op_call
-      { }
+      { /* NOT SUPPORTED */ }
     | MZN_IDENTIFIER '(' comp_or_expr ')'
-      { }
+      { /* TODO:: */ }
     | MZN_IDENTIFIER '(' comp_or_expr ')' '(' expr ')'
-      { }
+      { /* TODO:: */ }
 
 comp_or_expr :
       expr_list
-      { }
+      { /* TODO:: */ }
     | expr_list MZN_WHERE expr
-      { }
+      { /* TODO:: */ }
 
 let_expr :
       MZN_LET '{' let_vardecl_item_list '}' MZN_IN expr %prec PREC_ANNO
-      { }
+      { /* TODO:: */ }
     | MZN_LET '{' let_vardecl_item_list comma_or_semi '}' MZN_IN expr %prec PREC_ANNO
-      { }
+      { /* TODO:: */ }
 
 let_vardecl_item_list :
       let_vardecl_item
-      { }
+      { /* TODO:: */ }
     | constraint_item
-      { }
+      { /* TODO:: */ }
     | let_vardecl_item_list comma_or_semi let_vardecl_item
-      { }
+      { /* TODO:: */ }
     | let_vardecl_item_list comma_or_semi constraint_item
-      { }
+      { /* TODO:: */ }
 
 comma_or_semi : ',' | ';'
 
 let_vardecl_item :
       ti_expr_and_id annotations
-      { }
+      { /* TODO:: */ }
     | ti_expr_and_id annotations MZN_EQ expr
-      { }
+      { /* TODO:: */ }
 
 annotations :
       /* empty */

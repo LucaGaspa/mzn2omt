@@ -177,7 +177,7 @@ public:
 	string domain2str();
 	string printName(string name,DNumber i,DNumber j,DNumber k);
 	void decideName(string name,DNumber i,DNumber j,DNumber k);
-	void printRange(string name,DNumber i,DNumber j,DNumber k, IntervalSet* range);
+	void printRange(string name, bool isArray, DNumber i,DNumber j,DNumber k, IntervalSet* range);
 	void printDecl();
 };
 
