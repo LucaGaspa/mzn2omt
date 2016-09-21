@@ -12,11 +12,17 @@
 
 Symbol::Symbol(DOMAIN_TYPE dom){
     domain = dom;
-    //TODO:: settare il range al massimo dei valori consentiti "(-inf,+inf)" o (-10kk, 10kk)
-    //range = new IntervalSet(-inf,+inf);
     index = NULL;
     range = new IntervalSet(Interval(DNumber::minus_inf, DNumber::plus_inf));
     value = NULL;
+}
+
+Symbol::Symbol(){
+    domain = ID;
+    index = NULL;
+    range = new IntervalSet(Interval(DNumber::minus_inf, DNumber::plus_inf));
+    value = NULL;
+    return;
 }
 
 Symbol::~Symbol(){
@@ -29,6 +35,9 @@ void Symbol::setRange(Expr_node* set){
 
     //needed in set_expr: conversion from Expr_node*(ARR_INDEX) to Symbol
     //something like:
+
+    this->domain = ((Set*)set)->getDomain();
+
     if (this->range) {
         delete range;
     }
@@ -83,6 +92,9 @@ string Symbol::domain2str(){
             break;
         case FLOAT:
             return "Real";
+            break;
+        default:
+            return "Invalid DOMAIN";
             break;
     }
 }

@@ -390,7 +390,7 @@ base_ti_expr_tail:
       } 
      | set_expr
       {
-        $$ = new Symbol(INT); //TODO:: Init Set with correct domain and use it. INT = HARDCODING
+        $$ = new Symbol(); //TODO:: Init Set with correct domain and use it. INT = HARDCODING
         $$->setRange($1);
       }
     | MZN_TI_IDENTIFIER

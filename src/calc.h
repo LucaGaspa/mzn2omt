@@ -92,6 +92,7 @@ public:
 };
 
 class Set: public Expr_node {
+	DOMAIN_TYPE domain;			//domain of the Set
 	IntervalSet* set;
 
 public:
@@ -101,6 +102,8 @@ public:
 	IntervalSet* exportRange();
 	void interpret();
 	Literal* eval();
+
+	DOMAIN_TYPE getDomain() const;
 };
 
 class Fun: public Expr_node {
@@ -156,6 +159,7 @@ class Symbol {
 	ExprList* value;			//values if PAR. Literals stored in value[0]\
 
 public:		
+	Symbol();
 	Symbol(DOMAIN_TYPE dom);
 	//Symbol(Expr_node* set);
 	~Symbol();
