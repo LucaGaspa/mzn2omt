@@ -15,7 +15,7 @@ Symbol::Symbol(DOMAIN_TYPE dom){
     //TODO:: settare il range al massimo dei valori consentiti "(-inf,+inf)" o (-10kk, 10kk)
     //range = new IntervalSet(-inf,+inf);
     index = NULL;
-    range = NULL;
+    range = new IntervalSet(Interval(DNumber::minus_inf, DNumber::plus_inf));
     value = NULL;
 }
 
@@ -29,6 +29,9 @@ void Symbol::setRange(Expr_node* set){
 
     //needed in set_expr: conversion from Expr_node*(ARR_INDEX) to Symbol
     //something like:
+    if (this->range) {
+        delete range;
+    }
     this->range = ((Set*)(set))->exportRange();
 }
 
@@ -65,7 +68,7 @@ void Symbol::importIndexes(std::queue<Symbol*>* list){
 
 IntervalSet* Symbol::exportIndex(){
     IntervalSet* tmp = this->range;
-    this->range = NULL;
+    this->range = NULL; // TODO: memory leak?
     delete this;
     return tmp;
 }
