@@ -109,24 +109,18 @@ void Symbol::decideName(string name,DNumber i,DNumber j,DNumber k){
 
 void Symbol::printRange(string name, bool isArray, DNumber i,DNumber j,DNumber k, IntervalSet* range){
     if(! isArray){
-        if(range == NULL){
-            std::cout << "(assert (and (>= " << name << " 10000000) (<= " << name << " 10000000)))" << std::endl;
-        }else{
-            std::cout << "(assert (and (>= " << name << " " << (*range).lower().to_str() << ") (<= " << name << " " << (*range).upper().to_str() << ")))" << std::endl;
-        }
-        return;
-    }
-    if(range != NULL){
-        std::cout << "(assert (or ";
-        //optimization: if(not fragmented): NO 'or' AND NO 'for' needed
-        for (IntervalSet::subset_iterator it = (*range).subset_begin(), end = (*range).subset_end();
-            it != end; ++it) {
-            std::cout << "(and  (>= " << printName(name,i,0,0) << " " << it->lower().to_str() <<") (<= "<< printName(name,i,0,0) << " " << it->upper().to_str() <<")) ";
-        }
-        std::cout << "))" << endl;
+        std::cout << "(assert (and (>= " << name << " " << ((*range).lower().is_inf() ? "(- 0 10000000)" : (*range).lower().to_str()) << ") (<= " << name << " " << ((*range).upper().is_inf() ? "10000000" : (*range).upper().to_str()) << ")))" << std::endl;
     }else{
-        //limit on MiniZinc entire domain. TODO:: put a MACRO instead of number
-        std::cout << "(assert (and  (>= "<< printName(name,i,0,0) << " (- 0 10000000)) (<= "<< printName(name,i,0,0) << " 10000000)))" << endl;
+        if(range->is_fragmented()){
+            std::cout << "(assert (or ";
+            for (IntervalSet::subset_iterator it = (*range).subset_begin(), end = (*range).subset_end();
+                it != end; ++it) {
+                std::cout << "(and  (>= " << printName(name,i,j,k) << " " << (it->lower().is_inf() ? "(- 0 10000000)" : it->lower().to_str()) <<") (<= "<< printName(name,i,j,k) << " " << (it->upper().is_inf() ? "10000000" : it->upper().to_str()) <<")) ";
+            }
+            std::cout << "))" << endl;
+        }else{
+            std::cout << "(assert (and (>= " << printName(name,i,j,k) << " " << ((*range).lower().is_inf() ? "(- 0 10000000)" : (*range).lower().to_str()) << ") (<= " << printName(name,i,j,k) << " " << ((*range).upper().is_inf() ? "10000000" : (*range).upper().to_str()) << ")))" << std::endl;
+        }
     }
 }
 
@@ -154,7 +148,7 @@ void Symbol::printDecl(){
                     for (IntervalSet::value_iterator itt = ((*index)[1])->value_begin(), end_2 = ((*index)[1])->value_end();
             itt != end_2; ++itt) {
                         decideName(*id,*it,*itt,0);
-                        printRange(*id,true,*it,0,0,range);
+                        printRange(*id,true,*it,*itt,0,range);
                     }
                 }
                 break;
