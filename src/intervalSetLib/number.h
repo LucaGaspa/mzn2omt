@@ -77,6 +77,10 @@ public:
     static const DNumber minus_inf;
 
 private:
+    std::string mpq_to_smt2(const mpq_class &value) const;
+    ///< returns SmtLibv2.0 representation of an mpq value,
+    ///< NOTE: assumes the value is not infinite or indeterminate
+
     mpq_class val_;
     mpq_class eps_;
 

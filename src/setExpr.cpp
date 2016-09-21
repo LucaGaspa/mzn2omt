@@ -14,7 +14,13 @@ Set::Set(Expr_node* a, Expr_node* b){
 	Literal* lb = a->eval();
 	Literal* ub = b->eval();
 
-	Interval s = Interval(lb->toString(),ub->toString());
+    std::string lb_repr = lb->toString();
+    std::string ub_repr = ub->toString();
+
+    DNumber lb_num = DNumber(lb_repr);
+    DNumber ub_num = DNumber(ub_repr);
+
+	Interval s = Interval(lb_num, ub_num);
 	set = new IntervalSet(s);
 }
 
