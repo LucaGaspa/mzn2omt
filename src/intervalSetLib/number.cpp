@@ -27,12 +27,9 @@
 #include <sstream>
 #include <iomanip>
 
-#include <iostream>
-
 //-----------------------------------------------------------------------------
 // Static Members
 //-----------------------------------------------------------------------------
-
 
 const DNumber DNumber::plus_inf(1, 0);
 const DNumber DNumber::minus_inf(-1, 0);
