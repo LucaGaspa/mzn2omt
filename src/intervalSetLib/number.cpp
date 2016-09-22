@@ -35,10 +35,10 @@ const DNumber DNumber::plus_inf(1, 0);
 const DNumber DNumber::minus_inf(-1, 0);
 const mpz_class DNumber::zero_(0);
 
-const std::string minus_inf_repr = "(- 1000000000)"; // "-inf"
-const std::string plus_inf_repr = "1000000000";      // "+inf"
-const std::string indeterminate_repr = "(/ 0 0)";    // "0/0"
-const std::string eps_repr = "(/ 1 1000000000)";     // "eps"
+static const std::string plus_inf_repr = "10000000";      // "+inf"
+static const std::string minus_inf_repr = "(- " + plus_inf_repr + ")"; // "-inf"
+static const std::string indeterminate_repr = "(/ 0 0)";    // "0/0"
+static const std::string eps_repr = "(/ 1 " + plus_inf_repr + ")";     // "eps"
 
 //-----------------------------------------------------------------------------
 // Init/Deinit
