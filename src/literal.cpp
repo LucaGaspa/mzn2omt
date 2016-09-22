@@ -29,9 +29,17 @@ Literal::Literal(DOMAIN_TYPE d, string lit){
 	domain = d;
 	if(domain == ID){
 		id = lit;
+		value = DNumber("0");
 	}else{
+		id = "NULL";
 		value = DNumber(lit);
 	}
+	index = NULL;
+}
+
+Literal::Literal(DOMAIN_TYPE d, DNumber lit){
+	domain = d;
+	value = lit;
 	index = NULL;
 }
 
@@ -45,7 +53,7 @@ void Literal::interpret(){
 			std::cout << id;
 		}
 	}else{
-		std::cout << value.mpq_to_str();
+		std::cout << value.to_str();
 	}
 }
 
@@ -73,6 +81,6 @@ string Literal::toString() const{
 	if(domain == ID){
 		return id;
 	}else{
-		return value.mpq_to_str();
+		return value.to_str();
 	}
 }

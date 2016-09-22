@@ -97,7 +97,7 @@ string Symbol::domain2str(){
 }
 
 string Symbol::printName(string name,DNumber i,DNumber j,DNumber k){
-    return name + "__" + i.mpq_to_str() + "__" + j.mpq_to_str() + "__" + k.mpq_to_str();
+    return name + "__" + i.to_str() + "__" + j.to_str() + "__" + k.to_str();
 }
 
 void Symbol::decideName(string name,DNumber i,DNumber j,DNumber k){

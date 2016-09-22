@@ -20,13 +20,13 @@ Set::Set(Expr_node* a, Expr_node* b){
 		this->domain = INT;
 	}
 
-    std::string lb_repr = lb->toString();
-    std::string ub_repr = ub->toString();
+    //std::string lb_repr = lb->toString();
+    //std::string ub_repr = ub->toString();
 
-    DNumber lb_num = DNumber(lb_repr);
-    DNumber ub_num = DNumber(ub_repr);
+    //DNumber lb_num = DNumber(lb_repr);
+    //DNumber ub_num = DNumber(ub_repr);
 
-	Interval s = Interval(lb_num, ub_num);
+	Interval s = Interval(lb->getValue(), ub->getValue());
 	set = new IntervalSet(s);
 }
 

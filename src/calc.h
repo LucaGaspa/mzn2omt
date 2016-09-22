@@ -83,6 +83,7 @@ class Literal: public Expr_node {
 public:
 	Literal(DOMAIN_TYPE d, const char* lit);
 	Literal(DOMAIN_TYPE d, string lit);
+	Literal(DOMAIN_TYPE d, DNumber lit);
 
 	Literal& operator +(const Literal& other) const;
 
