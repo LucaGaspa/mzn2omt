@@ -76,12 +76,14 @@ public:
 class Literal: public Expr_node {
 	//Literal represnts both IDs, (int,bool,float) literals and array IDs with index to access
 	DOMAIN_TYPE domain;			//domain of literal
-	string* id;					//ID
+	string id;					//ID
+	DNumber value;
 	ExprList* index;			//indexs to access the array
 
 public:
 	Literal(DOMAIN_TYPE d, const char* lit);
-	
+	Literal(DOMAIN_TYPE d, string lit);
+
 	Literal& operator +(const Literal& other) const;
 
 	void interpret();
@@ -89,6 +91,7 @@ public:
 
 	string toString() const;
 	DOMAIN_TYPE getDomain() const;
+	DNumber getValue() const;
 };
 
 class Set: public Expr_node {
@@ -156,7 +159,7 @@ class Symbol {
 	vector<IntervalSet*>* index;	//array index must be PAR and INT
 
 	string* id;					//ID
-	ExprList* value;			//values if PAR. Literals stored in value[0]\
+	ExprList* value;			//values. if PAR: Literals stored in value[0]\
 
 public:		
 	Symbol();

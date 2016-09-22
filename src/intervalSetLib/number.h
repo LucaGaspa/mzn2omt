@@ -72,6 +72,7 @@ public:
     std::string to_str() const;
     std::string integral_repr() const;
     std::string epsilon_repr() const;
+    std::string mpq_to_str() const;
 
     static const DNumber plus_inf;
     static const DNumber minus_inf;

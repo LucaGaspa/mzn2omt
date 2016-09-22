@@ -53,7 +53,8 @@ Literal* Symbol::getValue(){
     if(value != NULL){
         return value->eval();
     }else{
-        return new Literal(domain, id->c_str());
+        //return new Literal(domain, id->c_str());
+        return NULL;
     }
     
 }
@@ -68,14 +69,13 @@ void Symbol::importIndexes(std::queue<Symbol*>* list){
         list->pop();
 
         index->push_back(tmp->exportIndex());
-
+        delete tmp;
     }
 }
 
 IntervalSet* Symbol::exportIndex(){
     IntervalSet* tmp = this->range;
     this->range = NULL; // TODO: memory leak?
-    delete this;
     return tmp;
 }
 
@@ -97,7 +97,7 @@ string Symbol::domain2str(){
 }
 
 string Symbol::printName(string name,DNumber i,DNumber j,DNumber k){
-    return name + "__" + i.to_str() + "__" + j.to_str() + "__" + k.to_str();
+    return name + "__" + i.mpq_to_str() + "__" + j.mpq_to_str() + "__" + k.mpq_to_str();
 }
 
 void Symbol::decideName(string name,DNumber i,DNumber j,DNumber k){
@@ -113,10 +113,9 @@ void Symbol::printRange(string name, bool isArray, DNumber i,DNumber j,DNumber k
                   << std::endl;
     } else {
         // EDIT: stronger, can be more effective for smt2 theory solvers
-        std::string name = printName(name, i, j, k);
         std::cout << "(assert (and (<= "
                   << range->lower().to_str() << " "
-                  << name << ") (<= " << name << " "
+                  << printName(name, i, j, k) << ") (<= " << printName(name, i, j, k) << " "
                   << range->upper().to_str() << ")))" << std::endl;
         if(range->is_fragmented()){
             std::cout << "(assert (or ";
@@ -124,7 +123,7 @@ void Symbol::printRange(string name, bool isArray, DNumber i,DNumber j,DNumber k
                     end = range->subset_end(); it != end; ++it) {
                 std::cout << "(and  (<= "
                           << it->lower().to_str() << " "
-                          << name << ") (<= "<< name << " "
+                          << printName(name, i, j, k) << ") (<= "<< printName(name, i, j, k) << " "
                           << it->upper().to_str()
                           <<")) ";
             }

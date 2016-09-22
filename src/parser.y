@@ -456,7 +456,7 @@ set_expr :
       }
     | set_expr MZN_PLUS set_expr
       {
-        //TODO::
+        $$ = new Expr(MZN_PLUS,2,$1,$3);
       }
     | set_expr MZN_MINUS set_expr
       {
@@ -647,8 +647,8 @@ expr_atom_head :
       }
     | MZN_IDENTIFIER array_access_tail
       {
-        $$ = new Literal(ID,$1);
-        delete $1;
+        //$$ = new Literal(ID,$1);
+        //delete $1;
         //$$->setAccessIndex($2);
       }
     | MZN_UNDERSCORE

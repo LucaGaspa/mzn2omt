@@ -294,6 +294,19 @@ std::string DNumber::mpq_to_smt2(const mpq_class &value) const
     }
 };
 
+std::string DNumber::mpq_to_str() const
+{
+    static mpz_class one(1);
+    const mpz_class &den = val_.get_den();
+    if (cmp(den, one) == 0) {
+        return val_.get_str(10);
+    } else {
+        std::stringstream ss;
+        ss << ((float)stoi(val_.get_num().get_str(10)) / (float)stoi(den.get_str(10)));
+        return ss.str();
+    }
+}
+
 //-----------------------------------------------------------------------------
 // Private Help Functions
 //-----------------------------------------------------------------------------
