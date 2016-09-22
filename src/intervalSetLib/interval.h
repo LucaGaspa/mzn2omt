@@ -47,6 +47,7 @@ public:
     Interval();
     Interval(const T value);
     Interval(const T lower, const T upper);
+    Interval(const Interval &other);
     virtual ~Interval();
 
     T card() const;
@@ -134,6 +135,13 @@ Interval<T>::Interval(const T value)
 template <class T>
 Interval<T>::Interval(const T lower, const T upper)
     : lower_(lower), upper_(upper)
+{
+    // nothing to do
+};
+
+template <class T>
+Interval<T>::Interval(const Interval &other)
+    : lower_(other.lower_), upper_(other.upper_)
 {
     // nothing to do
 };
