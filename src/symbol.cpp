@@ -30,18 +30,15 @@ Symbol::~Symbol(){
     return;
 }
 
-void Symbol::setRange(Expr_node* set){
+void Symbol::setRange(DOMAIN_TYPE d, IntervalSet* set){
     //create IntervalSet* range from set
 
-    //needed in set_expr: conversion from Expr_node*(ARR_INDEX) to Symbol
-    //something like:
-
-    this->domain = ((Set*)set)->getDomain();
+    this->domain = d;
 
     if (this->range) {
         delete range;
     }
-    this->range = ((Set*)(set))->exportRange();
+    this->range = set;
 }
 
 void Symbol::setValue(Expr_node* expr){

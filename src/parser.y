@@ -391,7 +391,8 @@ base_ti_expr_tail:
      | set_expr
       {
         $$ = new Symbol(); //TODO:: Init Set with correct domain and use it. INT = HARDCODING
-        $$->setRange($1);
+        $$->setRange(((Set*)$1)->getDomain(),((Set*)$1)->exportRange());
+        delete $1;
       }
     | MZN_TI_IDENTIFIER
       {

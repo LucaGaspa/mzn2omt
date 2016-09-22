@@ -33,7 +33,6 @@ Set::Set(Expr_node* a, Expr_node* b){
 IntervalSet* Set::exportRange(){
 	IntervalSet* tmp = this->set;
 	this->set = NULL;
-	delete this;
 	return tmp;
 }
 
