@@ -48,6 +48,7 @@ class IntervalSet {
 public:
     IntervalSet();
     IntervalSet(Interval<T> ival);
+    IntervalSet(const IntervalSet &other);
     virtual ~IntervalSet();
 
     void add(const Interval<T> &ival);
@@ -169,6 +170,15 @@ template <class T>
 IntervalSet<T>::IntervalSet(Interval<T> ival)
 {
     this->add(ival);
+};
+
+template <class T>
+IntervalSet<T>::IntervalSet(const IntervalSet &other)
+{
+    for (const_subset_iterator it = other.subset_begin(),
+            end = other.subset_end(); it != end; ++it) {
+        this->add(*it);
+    }
 };
 
 template <class T>
