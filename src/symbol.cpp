@@ -109,17 +109,29 @@ void Symbol::decideName(string name,DNumber i,DNumber j,DNumber k){
 
 void Symbol::printRange(string name, bool isArray, DNumber i,DNumber j,DNumber k, IntervalSet* range){
     if(! isArray){
-        std::cout << "(assert (and (>= " << name << " " << ((*range).lower().is_inf() ? "(- 0 10000000)" : (*range).lower().to_str()) << ") (<= " << name << " " << ((*range).upper().is_inf() ? "10000000" : (*range).upper().to_str()) << ")))" << std::endl;
-    }else{
+        std::cout << "(assert (and (<= "
+                  << range->lower().to_str() << " "
+                  << name << ") (<= " << name << " "
+                  << range->upper().to_str() << ")))"
+                  << std::endl;
+    } else {
+        // EDIT: stronger, can be more effective for smt2 theory solvers
+        std::string name = printName(name, i, j, k);
+        std::cout << "(assert (and (<= "
+                  << range->lower().to_str() << " "
+                  << name << ") (<= " << name << " "
+                  << range->upper().to_str() << ")))" << std::endl;
         if(range->is_fragmented()){
             std::cout << "(assert (or ";
-            for (IntervalSet::subset_iterator it = (*range).subset_begin(), end = (*range).subset_end();
-                it != end; ++it) {
-                std::cout << "(and  (>= " << printName(name,i,j,k) << " " << (it->lower().is_inf() ? "(- 0 10000000)" : it->lower().to_str()) <<") (<= "<< printName(name,i,j,k) << " " << (it->upper().is_inf() ? "10000000" : it->upper().to_str()) <<")) ";
+            for (IntervalSet::subset_iterator it = range->subset_begin(),
+                    end = range->subset_end(); it != end; ++it) {
+                std::cout << "(and  (<= "
+                          << it->lower().to_str() << " "
+                          << name << ") (<= "<< name << " "
+                          << it->upper().to_str()
+                          <<")) ";
             }
             std::cout << "))" << endl;
-        }else{
-            std::cout << "(assert (and (>= " << printName(name,i,j,k) << " " << ((*range).lower().is_inf() ? "(- 0 10000000)" : (*range).lower().to_str()) << ") (<= " << printName(name,i,j,k) << " " << ((*range).upper().is_inf() ? "10000000" : (*range).upper().to_str()) << ")))" << std::endl;
         }
     }
 }
