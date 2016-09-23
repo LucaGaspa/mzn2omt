@@ -48,7 +48,7 @@ void Literal::interpret(){
 	if(domain == ID){
 		Symbol* sym = SymbolTable::getInstance().get(this->id);
 		if(sym != NULL){
-			Literal* tmp = sym->getValue();
+			Literal* tmp = (Literal*) sym->getValue();
 			std::cout << tmp->toString();
 		}else{
 			std::cout << id;
@@ -58,7 +58,7 @@ void Literal::interpret(){
 	}
 }
 
-Literal* Literal::eval(){
+Expr_node* Literal::eval(){
 	//TODO:: if(index != NULL) --> return SymbolTable::getInstance().get(printName(id));
 	if(domain == ID){
 		Symbol* tmp = SymbolTable::getInstance().get(this->id);

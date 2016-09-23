@@ -49,7 +49,7 @@ void Symbol::setValue(Expr_node* expr){
     }
 }
 
-Literal* Symbol::getValue(){
+Expr_node* Symbol::getValue(){
     if(value != NULL){
         return value->eval();
     }else{

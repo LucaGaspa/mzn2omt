@@ -41,7 +41,7 @@ class Expr_node {
 	//Container for various items. Never istantiated (Pure virtual class).
 public:
 	virtual void interpret() = 0;
-	virtual Literal* eval() = 0;
+	virtual Expr_node* eval() = 0;
 };
 
 
@@ -55,7 +55,7 @@ public:
 	Expr(int oper, int nops, ...);
 	
 	void interpret();
-	Literal* eval();
+	Expr_node* eval();
 };
 
 
@@ -67,7 +67,7 @@ public:
 	ExprList(Expr_node* el);
 
 	void interpret();
-	Literal* eval();
+	Expr_node* eval();
 
 	void add(Expr_node* el);
 	std::vector<Expr_node*>* getValues();
@@ -96,7 +96,7 @@ public:
 	//Literal& operator /(const Literal & other) const;	//Not yet implemented
 
 	void interpret();
-	Literal* eval();
+	Expr_node* eval();
 
 	string toString() const;
 	DOMAIN_TYPE getDomain() const;
@@ -114,9 +114,10 @@ public:
 
 	IntervalSet* exportRange();
 	void interpret();
-	Literal* eval();
+	Expr_node* eval();
 
 	DOMAIN_TYPE getDomain() const;
+	bool set_in(Literal* value);
 };
 
 class Fun: public Expr_node {
@@ -130,7 +131,7 @@ class Fun: public Expr_node {
 
 public:
 	void interpret();
-	Literal* eval();
+	Expr_node* eval();
 };
 
 class Let: public Expr_node {
@@ -140,7 +141,7 @@ class Let: public Expr_node {
 
 public:
 	void interpret();
-	Literal* eval();
+	Expr_node* eval();
 };
 
 class Ite: public Expr_node {
@@ -154,7 +155,7 @@ class Ite: public Expr_node {
 
 public:
 	void interpret();
-	Literal* eval();
+	Expr_node* eval();
 };
 
 
@@ -186,7 +187,7 @@ public:
 	inline DOMAIN_TYPE getDomain(){return domain;};
 	inline string getID(){return *id;};
 
-	Literal* getValue();
+	Expr_node* getValue();
 
 	void importIndexes(queue<Symbol*>* ind);
 	IntervalSet* exportIndex();
