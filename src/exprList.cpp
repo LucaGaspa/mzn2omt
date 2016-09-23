@@ -19,6 +19,10 @@ void ExprList::add(Expr_node* el){
 	element->push_back(el);
 }
 
+std::vector<Expr_node*>* ExprList::getValues(){
+	return element;
+}
+
 void ExprList::interpret(){
 	//TODO::
 	//this should never happen!

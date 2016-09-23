@@ -133,7 +133,7 @@
 %token MZN_PLUSPLUS_QUOTED "'++'"
 
 //%type <var> MZN_BOOL_LITERAL
-%type <expr> expr_atom_head set_expr expr expr_list expr_list_head
+%type <expr> expr_atom_head set_expr expr expr_list expr_list_head set_literal
 %type <symbol> base_ti_expr_tail base_ti_expr ti_expr ti_expr_and_id
 %type <symbolList> ti_expr_list ti_expr_list_head
 
@@ -390,7 +390,7 @@ base_ti_expr_tail:
       } 
      | set_expr
       {
-        $$ = new Symbol(); //TODO:: Init Set with correct domain and use it. INT = HARDCODING
+        $$ = new Symbol();
         $$->setRange(((Set*)$1)->getDomain(),((Set*)$1)->exportRange());
         delete $1;
       }
@@ -428,15 +428,15 @@ set_expr :
       }
     | set_expr MZN_UNION set_expr
       {
-        //TODO::
+        //TODO:: $$ = new Set(MZN_UNION,$1,$3);
       } 
      | set_expr MZN_DIFF set_expr
       {
-        //TODO::
+        //TODO:: $$ = new Set(MZN_DIFF,$1,$3);
       }
     | set_expr MZN_SYMDIFF set_expr
       {
-        //TODO::
+        //TODO:: $$ = new Set(MZN_SYMDIFF,$1,$3);
       }
     | set_expr MZN_DOTDOT set_expr
       {
@@ -448,11 +448,11 @@ set_expr :
       }
     | set_expr MZN_INTERSECT set_expr
       {
-        //TODO::
+        //TODO:: $$ = new Set(MZN_INTERSECT,$1,$3);
       }
     | set_expr MZN_PLUSPLUS set_expr
       {
-        //TODO::
+        //TODO:: $$ = new Set(MZN_PLUSPLUS,$1,$3);
       }
     | set_expr MZN_PLUS set_expr
       {
@@ -460,15 +460,19 @@ set_expr :
       }
     | set_expr MZN_MINUS set_expr
       {
-        //TODO::
+        $$ = new Expr(MZN_MINUS,2,$1,$3);
       }
     | set_expr MZN_MULT set_expr
       {
         //TODO::
+        std::cerr << "Not implemented mult" << std::endl;
+        exit(0);
       }
     | set_expr MZN_DIV set_expr
       {
         //TODO::
+        std::cerr << "Not implemented div" << std::endl;
+        exit(0);
       }
     | set_expr MZN_IDIV set_expr
       {
@@ -679,11 +683,13 @@ expr_atom_head :
         delete $1;
       }
     | string_expr
-      { /*nothing to do*/ }
+      { /*nothing to do*/ $$ = NULL; }
     | MZN_ABSENT
       { /* NOT SUPPORTED */}
     | set_literal
-      { /* TODO:: */ }
+      {
+        $$ = $1;
+      }
     | set_literal array_access_tail
       { /* TODO:: */ }
     | set_comp
@@ -733,10 +739,12 @@ array_access_tail :
 
 set_literal :
       '{' '}'
-      { /* TODO:: */ }
+      {
+        $$ = new Set();
+      }
     | '{' expr_list '}'
       {
-        //$$ = new Set($1) --> evaluate expr and create an IntervalSet
+        $$ = new Set($2);
       }
 
 set_comp :

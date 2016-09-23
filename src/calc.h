@@ -70,14 +70,15 @@ public:
 	Literal* eval();
 
 	void add(Expr_node* el);
+	std::vector<Expr_node*>* getValues();
 };
 
 
 class Literal: public Expr_node {
-	//Literal represnts both IDs, (int,bool,float) literals and array IDs with index to access
+	//Literal represnts both IDs, (int,bool,float) literals and array IDs with access index
 	DOMAIN_TYPE domain;			//domain of literal
 	string id;					//ID
-	DNumber value;
+	DNumber value;				//VALUE
 	ExprList* index;			//indexs to access the array
 
 public:
@@ -86,6 +87,13 @@ public:
 	Literal(DOMAIN_TYPE d, DNumber lit);
 
 	Literal& operator +(const Literal& other) const;
+	Literal& operator -(const Literal & other) const;
+	Literal& operator <(const Literal & other) const;
+	Literal& operator <=(const Literal & other) const;
+	Literal& operator >(const Literal & other) const;
+	Literal& operator ==(const Literal & other) const;
+	//Literal& operator *(const Literal & other) const;	//Not yet implemented
+	//Literal& operator /(const Literal & other) const;	//Not yet implemented
 
 	void interpret();
 	Literal* eval();
@@ -100,6 +108,7 @@ class Set: public Expr_node {
 	IntervalSet* set;
 
 public:
+	Set();
 	Set(Expr_node* a);
 	Set(Expr_node* a, Expr_node* b);
 

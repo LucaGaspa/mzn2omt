@@ -44,6 +44,7 @@ Literal::Literal(DOMAIN_TYPE d, DNumber lit){
 }
 
 void Literal::interpret(){
+	//TODO:: if(index != NULL) --> return printName();
 	if(domain == ID){
 		Symbol* sym = SymbolTable::getInstance().get(this->id);
 		if(sym != NULL){
@@ -58,6 +59,7 @@ void Literal::interpret(){
 }
 
 Literal* Literal::eval(){
+	//TODO:: if(index != NULL) --> return SymbolTable::getInstance().get(printName(id));
 	if(domain == ID){
 		Symbol* tmp = SymbolTable::getInstance().get(this->id);
 		if(tmp != NULL){

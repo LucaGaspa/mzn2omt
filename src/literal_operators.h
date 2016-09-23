@@ -18,9 +18,90 @@ Literal& Literal::operator +(const Literal & other) const {
 
 	DNumber tmp = value + other.getValue();
 	return *(new Literal(d, tmp));
-	//Literal* op1 = this->eval();
-	//Literal* op2 = other->eval();
-	//DNumber tmp = op1->getValue() + op2->getValue();
-
-	//return Literal(d, tmp.mpq_to_str());
 }
+
+Literal& Literal::operator -(const Literal & other) const {
+	DOMAIN_TYPE d;
+	if(domain == FLOAT || other.getDomain() == FLOAT){
+		d = FLOAT;
+	}else{
+		d = INT;
+	}
+
+	DNumber tmp = value - other.getValue();
+	return *(new Literal(d, tmp));
+}
+
+Literal& Literal::operator <(const Literal & other) const {
+	DOMAIN_TYPE d;
+	if(domain == FLOAT || other.getDomain() == FLOAT){
+		d = FLOAT;
+	}else{
+		d = INT;
+	}
+
+	DNumber tmp = value < other.getValue();
+	return *(new Literal(d, tmp));
+}
+
+Literal& Literal::operator <=(const Literal & other) const {
+	DOMAIN_TYPE d;
+	if(domain == FLOAT || other.getDomain() == FLOAT){
+		d = FLOAT;
+	}else{
+		d = INT;
+	}
+
+	DNumber tmp = value <= other.getValue();
+	return *(new Literal(d, tmp));
+}
+
+Literal& Literal::operator >(const Literal & other) const {
+	DOMAIN_TYPE d;
+	if(domain == FLOAT || other.getDomain() == FLOAT){
+		d = FLOAT;
+	}else{
+		d = INT;
+	}
+
+	DNumber tmp = value > other.getValue();
+	return *(new Literal(d, tmp));
+}
+
+Literal& Literal::operator ==(const Literal & other) const {
+	DOMAIN_TYPE d;
+	if(domain == FLOAT || other.getDomain() == FLOAT){
+		d = FLOAT;
+	}else{
+		d = INT;
+	}
+
+	DNumber tmp = value == other.getValue();
+	return *(new Literal(d, tmp));
+}
+
+/* NOT YET SUPPORTED in DNumber
+Literal& Literal::operator *(const Literal & other) const {
+	DOMAIN_TYPE d;
+	if(domain == FLOAT || other.getDomain() == FLOAT){
+		d = FLOAT;
+	}else{
+		d = INT;
+	}
+
+	DNumber tmp = value * other.getValue();
+	return *(new Literal(d, tmp));
+}
+
+Literal& Literal::operator /(const Literal & other) const {
+	DOMAIN_TYPE d;
+	if(domain == FLOAT || other.getDomain() == FLOAT){
+		d = FLOAT;
+	}else{
+		d = INT;
+	}
+
+	DNumber tmp = value / other.getValue();
+	return *(new Literal(d, tmp));
+}
+//****************************************************************/

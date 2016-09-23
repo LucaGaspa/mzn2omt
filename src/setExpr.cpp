@@ -10,6 +10,24 @@
 
 #include "calc.h"
 
+Set::Set(){
+	set = new IntervalSet();
+}
+
+Set::Set(Expr_node* a){
+	// a is an ExprList necessarily due to grammar construction
+	// a should be a 1 dimension list (2 dim set has no sense)
+	set = new IntervalSet();
+	Literal* tmp;
+	//ExprList used as box for a vector of values
+	//to keep logic inside ExprList should implement wrapper for vector
+	std::vector<Expr_node*>* v = ((ExprList*)a)->getValues();
+	for (vector<Expr_node*>::iterator it = v->begin(); it != v->end(); it++){
+		tmp = (*it)->eval();
+		set->add(Interval(tmp->getValue()));
+	}
+}
+
 Set::Set(Expr_node* a, Expr_node* b){
 	Literal* lb = a->eval();
 	Literal* ub = b->eval();
@@ -20,15 +38,20 @@ Set::Set(Expr_node* a, Expr_node* b){
 		this->domain = INT;
 	}
 
-    //std::string lb_repr = lb->toString();
-    //std::string ub_repr = ub->toString();
-
-    //DNumber lb_num = DNumber(lb_repr);
-    //DNumber ub_num = DNumber(ub_repr);
-
-	Interval s = Interval(lb->getValue(), ub->getValue());
+    Interval s = Interval(lb->getValue(), ub->getValue());
 	set = new IntervalSet(s);
 }
+
+/*
+Set::Set(int oper, Expr_node* a, Expr_node* b){
+	switch(oper){
+		case MZN_UNION:
+			break;
+		default:
+			break;
+	}
+}
+*/
 
 IntervalSet* Set::exportRange(){
 	IntervalSet* tmp = this->set;

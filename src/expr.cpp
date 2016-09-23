@@ -242,19 +242,19 @@ Literal* Expr::eval(){
 			
 			break;
 		case MZN_LE:
-			
+			res = &(*op1 < *op2);
 			break;
 		case MZN_GR:
-			
+			res = &(*op1 > *op2);
 			break;
 		case MZN_LQ:
-			
+			res = &(*op1 <= *op2);
 			break;
 		case MZN_GQ:
-			
+			//res = &(*op1 >= *op2);
 			break;
 		case MZN_EQ:
-			
+			res = &(*op1 == *op2);
 			break;
 		case MZN_NQ:
 			
@@ -262,50 +262,50 @@ Literal* Expr::eval(){
 
 		case MZN_IN:
 			//TODO:: choose an encoding
-			std::cerr << "Not supported expr encoding: expr.cpp";
+			std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
 			break;
 		case MZN_SUBSET:
 			//TODO:: choose an encoding
-			std::cerr << "Not supported expr encoding: expr.cpp";
+			std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
 			break;
 		case MZN_SUPERSET:
 			//TODO:: choose an encoding
-			std::cerr << "Not supported expr encoding: expr.cpp";
+			std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
 			break;
 		case MZN_UNION:
 			//TODO:: choose an encoding
-			std::cerr << "Not supported expr encoding: expr.cpp";
+			std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
 			break;
 		case MZN_DIFF:
 			//TODO:: choose an encoding
-			std::cerr << "Not supported expr encoding: expr.cpp";
+			std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
 			break;
 		case MZN_SYMDIFF:
 			//TODO:: choose an encoding
-			std::cerr << "Not supported expr encoding: expr.cpp";
+			std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
 			break;
 		case MZN_DOTDOT:
 			//TODO:: choose an encoding
-			std::cerr << "Not supported expr encoding: expr.cpp";
+			std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
 			break;
 		case MZN_DOTDOT_QUOTED:
 			//TODO:: choose an encoding
-			std::cerr << "Not supported expr encoding: expr.cpp";
+			std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
 			break;
 		case MZN_INTERSECT:
 			//TODO:: choose an encoding
-			std::cerr << "Not supported expr encoding: expr.cpp";
+			std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
 			break;
 		case MZN_PLUSPLUS:
 			//TODO:: choose an encoding
-			std::cerr << "Not supported expr encoding: expr.cpp";
+			std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
 			break;
 
 		case MZN_PLUS:
-			res = &(*op1 + *op2); //TODO:: review syntax
+			res = &(*op1 + *op2);
 			break;
 		case MZN_MINUS:
-			//res = &(*op1 - *op2);
+			res = &(*op1 - *op2);
 			break;
 		case MZN_MULT:
 			//res = &(*op1 * *op2);
@@ -322,7 +322,7 @@ Literal* Expr::eval(){
 
 		case MZN_QUOTED_IDENTIFIER:
 			//TODO:: choose an encoding
-			std::cerr << "Not supported expr encoding: expr.cpp";
+			std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
 			break;
 
 		case MZN_NOT:
