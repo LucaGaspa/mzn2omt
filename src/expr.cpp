@@ -257,7 +257,7 @@ Expr_node* Expr::eval(){
 			res = &(*((Literal*)op1) == *((Literal*)op2));
 			break;
 		case MZN_NQ:
-			
+			//TODO::
 			break;
 
 		case MZN_IN:
@@ -276,8 +276,7 @@ Expr_node* Expr::eval(){
 			std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
 			break;
 		case MZN_UNION:
-			//TODO:: choose an encoding
-			std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
+			return ((Set*) op1)->set_union((Set*) op2);
 			break;
 		case MZN_DIFF:
 			//TODO:: choose an encoding

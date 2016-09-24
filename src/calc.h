@@ -110,14 +110,16 @@ class Set: public Expr_node {
 public:
 	Set();
 	Set(Expr_node* a);
-	Set(Expr_node* a, Expr_node* b);
+	Set(int oper, Expr_node* a, Expr_node* b);
 
 	IntervalSet* exportRange();
 	void interpret();
 	Expr_node* eval();
 
 	DOMAIN_TYPE getDomain() const;
+	IntervalSet* getSet();
 	bool set_in(Literal* value);
+	Set* set_union(Set* other);
 };
 
 class Fun: public Expr_node {

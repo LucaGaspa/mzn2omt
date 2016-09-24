@@ -9,6 +9,7 @@
  ***********************************************************************/
 
 #include "calc.h"
+#include "parser.tab.h"
 
 Set::Set(){
 	set = new IntervalSet();
@@ -28,30 +29,29 @@ Set::Set(Expr_node* a){
 	}
 }
 
-Set::Set(Expr_node* a, Expr_node* b){
-	Literal* lb = (Literal*) a->eval();
-	Literal* ub = (Literal*) b->eval();
-
-	if(lb->getDomain() == FLOAT || ub->getDomain() == FLOAT){
-		this->domain = FLOAT;
-	}else{
-		this->domain = INT;
-	}
-
-    Interval s = Interval(lb->getValue(), ub->getValue());
-	set = new IntervalSet(s);
-}
-
-/*
 Set::Set(int oper, Expr_node* a, Expr_node* b){
+	Interval s;
+
+	Expr_node* lb = a->eval();
+	Expr_node* ub = b->eval();
 	switch(oper){
+		case MZN_DOTDOT:
+			if(((Literal*) lb)->getDomain() == FLOAT || ((Literal*) ub)->getDomain() == FLOAT){
+				this->domain = FLOAT;
+			}else{
+				this->domain = INT;
+			}
+
+		    s = Interval(((Literal*) lb)->getValue(), ((Literal*) ub)->getValue());
+			set = new IntervalSet(s);
+			break;
 		case MZN_UNION:
+			*set = ((Set*) lb)->set->set_union(*(((Set*) ub)->getSet()));
 			break;
 		default:
 			break;
-	}
+	}	
 }
-*/
 
 IntervalSet* Set::exportRange(){
 	IntervalSet* tmp = this->set;
@@ -72,6 +72,15 @@ DOMAIN_TYPE Set::getDomain() const{
 	return domain;
 }
 
+IntervalSet* Set::getSet(){
+	return set;
+}
+
 bool Set::set_in(Literal* value){
 	return set->set_in(value->getValue());
+}
+
+Set* Set::set_union(Set* other){
+	return new Set(MZN_UNION, this, other);
+	//return set->set_union((other->getSet());
 }

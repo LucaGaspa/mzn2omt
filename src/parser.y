@@ -429,6 +429,7 @@ set_expr :
     | set_expr MZN_UNION set_expr
       {
         //TODO:: $$ = new Set(MZN_UNION,$1,$3);
+        $$ = new Set(MZN_UNION, $1, $3)
       } 
      | set_expr MZN_DIFF set_expr
       {
@@ -440,7 +441,7 @@ set_expr :
       }
     | set_expr MZN_DOTDOT set_expr
       {
-        $$ = new Set($1,$3);
+        $$ = new Set(MZN_DOTDOT,$1,$3);
       }
     | MZN_DOTDOT_QUOTED '(' expr ',' expr ')'
       {
