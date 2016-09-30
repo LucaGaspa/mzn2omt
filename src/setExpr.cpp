@@ -50,7 +50,7 @@ Set::Set(int oper, Expr_node* a, Expr_node* b){
 			break;
 		default:
 			break;
-	}	
+	}
 }
 
 IntervalSet* Set::exportRange(){

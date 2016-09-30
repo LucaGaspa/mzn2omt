@@ -36,6 +36,7 @@ enum EXPR_DOMAIN{INTINT,FLOATINT,INTFLOAT,FLOATFLOAT,BOOLBOOL};
 
 
 class Literal;
+class ExprList;
 
 class Expr_node {
 	//Container for various items. Never istantiated (Pure virtual class).
@@ -54,6 +55,9 @@ class Expr: public Expr_node {
 public:
 	Expr(int oper, int nops, ...);
 	
+	Expr_node* getOp_1();
+	Expr_node* getOp_2();
+
 	void interpret();
 	Expr_node* eval();
 };
@@ -120,6 +124,19 @@ public:
 	IntervalSet* getSet();
 	bool set_in(Literal* value);
 	Set* set_union(Set* other);
+};
+
+class Comp: public Expr_node {
+	std::vector<pair<Literal*,Set*>*>* ids;
+	Expr* condition;
+	Expr_node* expression;
+public:
+	Comp(Expr* e);
+	void add(Expr_node* e);
+	void setCondition(Expr_node* e);
+	void setExpression(Expr_node* e);
+	void interpret();
+	Expr_node* eval();
 };
 
 class Fun: public Expr_node {

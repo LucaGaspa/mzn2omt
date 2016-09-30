@@ -24,14 +24,17 @@ std::vector<Expr_node*>* ExprList::getValues(){
 }
 
 void ExprList::interpret(){
-	//TODO::
-	//this should never happen!
-	std::cerr << "Hey dude, this should never happen :/" << std::endl;
+	//DEBUG PURPOSE
+	std::cout << "ExprList printing: DEBUG PURPOSE" << std::endl;
+	for (vector<Expr_node*>::iterator it = element->begin(); it != element->end(); it++){
+		std::cout << std::endl;
+		(*it)->interpret();
+		std::cout << std::endl;
+	}
 	return;
 }
 
 Expr_node* ExprList::eval(){
-	//cerr << "Hey dude, this should never happen : exprList.cpp";
 	
 	//should be called only when searching a symbol in the symboltable
 	return element->front()->eval();

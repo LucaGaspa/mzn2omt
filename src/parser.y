@@ -134,6 +134,7 @@
 
 //%type <var> MZN_BOOL_LITERAL
 %type <expr> expr_atom_head set_expr expr expr_list expr_list_head set_literal
+%type <expr> comp_tail generator_list generator_list_head generator id_list id_list_head set_comp
 %type <symbol> base_ti_expr_tail base_ti_expr ti_expr ti_expr_and_id
 %type <symbolList> ti_expr_list ti_expr_list_head
 
@@ -750,37 +751,61 @@ set_literal :
 
 set_comp :
       '{' expr '|' comp_tail '}'
-      { /* TODO:: */ }
+      { 
+        ((Comp*)$4)->setExpression($2);
+        $$ = new Set(($4)->eval());
+      }
 
 comp_tail :
       generator_list
-      { /* TODO:: */ }
+      {
+        $$ = $1;
+      }
     | generator_list MZN_WHERE expr
-      { /* TODO:: */ }
+      {
+        $$ = $1;
+        ((Comp*)$$)->setCondition($3);
+      }
 
 generator_list : 
       generator_list_head comma_or_none
-      { /* TODO:: */ }
+      {
+        $$ = $1;
+      }
 
 generator_list_head :
       generator
-      { /* TODO:: */ }
+      {
+        $$ = new Comp((Expr*)$1);
+      }
     | generator_list_head ',' generator
-      { /* TODO:: */ }
+      {
+        $$ = $1;
+        ((Comp*)$$)->add($3);
+      }
 
 generator : 
       id_list MZN_IN expr
-      { /* TODO:: */ }
+      {
+        $$ = new Expr(MZN_IN,2,$1,$3);
+      }
 
 id_list : 
       id_list_head comma_or_none
-      { /* TODO:: */ }
+      {
+        $$ = $1;
+      }
 
 id_list_head :
       MZN_IDENTIFIER
-      { /* TODO:: */ }
+      {
+        $$ = new ExprList(new Literal(ID,$1));
+      }
     | id_list_head ',' MZN_IDENTIFIER
-      { /* TODO:: */ }
+      {
+        $$ = $1;
+        ((ExprList*)$$)->add(new Literal(ID,$3));
+      }
 
 simple_array_literal : 
       MZN_LEFT_BRACKET MZN_RIGHT_BRACKET
