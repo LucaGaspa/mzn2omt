@@ -16,6 +16,8 @@ Set::Set(){
 }
 
 Set::Set(Expr_node* a){
+	//this->domain = INT;
+
 	// a is an ExprList necessarily due to grammar construction
 	// a should be a 1 dimension list (2 dim set has no sense)
 	set = new IntervalSet();
@@ -25,6 +27,7 @@ Set::Set(Expr_node* a){
 	std::vector<Expr_node*>* v = ((ExprList*)a)->getValues();
 	for (vector<Expr_node*>::iterator it = v->begin(); it != v->end(); it++){
 		tmp = (*it)->eval();
+		this->domain = ((Literal*) tmp)->getDomain();
 		set->add(Interval(((Literal*) tmp)->getValue()));
 	}
 }
@@ -34,14 +37,13 @@ Set::Set(int oper, Expr_node* a, Expr_node* b){
 
 	Expr_node* lb = a->eval();
 	Expr_node* ub = b->eval();
+	if(((Literal*) lb)->getDomain() == FLOAT || ((Literal*) ub)->getDomain() == FLOAT){
+		this->domain = FLOAT;
+	}else{
+		this->domain = INT;
+	}
 	switch(oper){
 		case MZN_DOTDOT:
-			if(((Literal*) lb)->getDomain() == FLOAT || ((Literal*) ub)->getDomain() == FLOAT){
-				this->domain = FLOAT;
-			}else{
-				this->domain = INT;
-			}
-
 		    s = Interval(((Literal*) lb)->getValue(), ((Literal*) ub)->getValue());
 			set = new IntervalSet(s);
 			break;
@@ -61,6 +63,7 @@ IntervalSet* Set::exportRange(){
 
 void Set::interpret(){
 	std::cout << *set << endl;
+	//set->to_str();
 	return;
 }
 

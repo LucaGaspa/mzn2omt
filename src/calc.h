@@ -68,6 +68,7 @@ class ExprList: public Expr_node {
 	std::vector<Expr_node*>* element;
 
 public:
+	ExprList();
 	ExprList(Expr_node* el);
 
 	void interpret();
@@ -130,11 +131,16 @@ class Comp: public Expr_node {
 	std::vector<pair<Literal*,Set*>*>* ids;
 	Expr* condition;
 	Expr_node* expression;
+	ExprList* decompressedExpr;
 public:
 	Comp(Expr* e);
 	void add(Expr_node* e);
 	void setCondition(Expr_node* e);
 	void setExpression(Expr_node* e);
+	void initDecompression();
+	void decompress(int index);
+	void deleteDecompression();
+
 	void interpret();
 	Expr_node* eval();
 };
@@ -193,6 +199,7 @@ class Symbol {
 
 public:		
 	Symbol();
+	Symbol(Literal* lit);
 	Symbol(DOMAIN_TYPE dom);
 	//Symbol(Expr_node* set);
 	~Symbol();
@@ -261,6 +268,11 @@ class SymbolTable
         void globalInsert(std::string key, Symbol* value);
         void globalInsert(Symbol* symbol);
         void globalInsert(Symbol* symbol, Expr_node* expr);
+
+        void deleteLocalTable();
+        void newLocalTable();
+        void localInsert(string key, Symbol* value);
+
         Symbol* get(string key);
 };
 

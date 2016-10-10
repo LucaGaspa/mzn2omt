@@ -10,6 +10,10 @@
 
 #include "calc.h"
 
+ExprList::ExprList(){
+	element = new std::vector<Expr_node*>();
+}
+
 ExprList::ExprList(Expr_node* el){
 	element = new std::vector<Expr_node*>();
 	element->push_back(el);
@@ -37,5 +41,11 @@ void ExprList::interpret(){
 Expr_node* ExprList::eval(){
 	
 	//should be called only when searching a symbol in the symboltable
-	return element->front()->eval();
+	//return element->front()->eval();
+
+	if(element->size() == 1){
+		return element->front()->eval();
+	}else{
+		return this;
+	}
 }

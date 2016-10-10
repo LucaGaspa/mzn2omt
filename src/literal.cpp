@@ -65,6 +65,7 @@ Expr_node* Literal::eval(){
 		if(tmp != NULL){
 			return tmp->getValue();
 		}else{
+			std::cerr << "id: " << this->id << std::endl;
 			std::cerr << "LITERAL EVAL ERROR -- literal.cpp" << std::endl;
 		}
 	}

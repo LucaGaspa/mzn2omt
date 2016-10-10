@@ -391,6 +391,7 @@ base_ti_expr_tail:
       } 
      | set_expr
       {
+        //$1->interpret();
         $$ = new Symbol();
         $$->setRange(((Set*)$1)->getDomain(),((Set*)$1)->exportRange());
         delete $1;
@@ -458,11 +459,11 @@ set_expr :
       }
     | set_expr MZN_PLUS set_expr
       {
-        $$ = new Expr(MZN_PLUS,2,$1,$3);
+        //$$ = new Expr(MZN_PLUS,2,$1,$3);
       }
     | set_expr MZN_MINUS set_expr
       {
-        $$ = new Expr(MZN_MINUS,2,$1,$3);
+        //$$ = new Expr(MZN_MINUS,2,$1,$3);
       }
     | set_expr MZN_MULT set_expr
       {
@@ -583,6 +584,7 @@ expr :
     | expr MZN_DOTDOT expr
       {
         $$ = new Expr(MZN_DOTDOT,2,$1,$3);
+        //$$ = new Set(MZN_DOTDOT,$1,$3);
       }
     | MZN_DOTDOT_QUOTED '(' expr ',' expr ')'
       {
@@ -695,7 +697,9 @@ expr_atom_head :
     | set_literal array_access_tail
       { /* TODO:: */ }
     | set_comp
-      { /* TODO:: */ }
+      {
+        $$ = $1;
+      }
     | set_comp array_access_tail
       { /* TODO:: */ }
     | simple_array_literal

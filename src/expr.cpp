@@ -113,43 +113,43 @@ void Expr::interpret(){
 
         case MZN_IN:
             //TODO:: choose an encoding
-            std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
+            std::cerr << "Not supported expr encoding: expr.cpp 1" << std::endl;
             break;
         case MZN_SUBSET:
             //TODO:: choose an encoding
-            std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
+            std::cerr << "Not supported expr encoding: expr.cpp 2" << std::endl;
             break;
         case MZN_SUPERSET:
             //TODO:: choose an encoding
-            std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
+            std::cerr << "Not supported expr encoding: expr.cpp 3" << std::endl;
             break;
         case MZN_UNION:
             //TODO:: choose an encoding
-            std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
+            std::cerr << "Not supported expr encoding: expr.cpp 4" << std::endl;
             break;
         case MZN_DIFF:
             //TODO:: choose an encoding
-            std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
+            std::cerr << "Not supported expr encoding: expr.cpp 5" << std::endl;
             break;
         case MZN_SYMDIFF:
             //TODO:: choose an encoding
-            std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
+            std::cerr << "Not supported expr encoding: expr.cpp 6" << std::endl;
             break;
         case MZN_DOTDOT:
             //TODO:: choose an encoding
-            std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
+            std::cerr << "Not supported expr encoding: expr.cpp 7" << std::endl;
             break;
         case MZN_DOTDOT_QUOTED:
             //TODO:: choose an encoding
-            std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
+            std::cerr << "Not supported expr encoding: expr.cpp 8" << std::endl;
             break;
         case MZN_INTERSECT:
             //TODO:: choose an encoding
-            std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
+            std::cerr << "Not supported expr encoding: expr.cpp 9" << std::endl;
             break;
         case MZN_PLUSPLUS:
             //TODO:: choose an encoding
-            std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
+            std::cerr << "Not supported expr encoding: expr.cpp 10" << std::endl;
             break;
 
         case MZN_PLUS:
@@ -205,7 +205,7 @@ void Expr::interpret(){
 
         case MZN_QUOTED_IDENTIFIER:
             //TODO:: choose an encoding
-            std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
+            std::cerr << "Not supported expr encoding: expr.cpp 11" << std::endl;
             break;
 
         case MZN_NOT:
@@ -288,7 +288,8 @@ Expr_node* Expr::eval(){
             break;
         case MZN_DOTDOT:
             //TODO:: choose an encoding
-            std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
+            //std::cerr << "Not supported expr encoding: expr.cpp 16" << std::endl;
+            res = new Set(MZN_DOTDOT,op1,op2);
             break;
         case MZN_DOTDOT_QUOTED:
             //TODO:: choose an encoding
@@ -359,6 +360,7 @@ Comp::Comp(Expr* e){
     
     Expr_node* op1 = e->getOp_1();
     Expr_node* op2 = e->getOp_2();
+    op2 = op2->eval();
 
     std::vector<Expr_node*>* v = ((ExprList*)op1)->getValues();
 
@@ -380,6 +382,7 @@ void Comp::add(Expr_node* e){
     //TODO::check if e is an Expr or a literal
     Expr_node* op1 = ((Expr*)e)->getOp_1();
     Expr_node* op2 = ((Expr*)e)->getOp_2();
+    op2 = op2->eval();
 
     std::vector<Expr_node*>* v = ((ExprList*)op1)->getValues();
 
@@ -389,35 +392,45 @@ void Comp::add(Expr_node* e){
 }
 
 Expr_node* Comp::eval(){
-    /* TODO:: 
-        case MZN_WHERE:
-        // generator_list where exrp
-        // list of (list of IDs MZN_IN (presumably) Set) (MZN_WHERE expr | **empty**)
-        // i.e.: i,j IN 1..3, k IN 1..4 WHERE i<k
-        /*
-        create new local table.
-        cycle each ID over the set changing its local value at each iter
-        check that each local id value correspond to the WHERE condition
+    this->decompressedExpr = new ExprList();
 
-        needs a separate funciont: expr->evalConditioned(expr, comp_tail)
-        get list of id with domains
-        get condition
-        set environment
-        start ciclying
-    return list of values. (that will become a Set)
-    */
+    this->initDecompression();
+    this->decompress(0);
+    this->deleteDecompression();
 
+    return this->decompressedExpr;
+}
 
-    //vector di pair di Literal con set su cui deve ciclare
+void Comp::deleteDecompression(){
+    SymbolTable::getInstance().deleteLocalTable();
+}
 
-    /*
-    1 - creare tabella locale
-    2 - caricare ids
-    3 - per ogni pair ciclare sui possibili valori (innestandoli)
-    4 - se condition è true valutare la combinazione di valori (expression->eval())
-    5 - aggiungere expression->eval() alla ExprList da ritornare
-    */
+void Comp::initDecompression(){
+    SymbolTable::getInstance().newLocalTable();
+    for (vector<pair<Literal*,Set*>*>::iterator it = ids->begin(); it != ids->end(); it++){
+        SymbolTable::getInstance().localInsert((*it)->first->toString(), new Symbol((*it)->first));
+    }
+}
 
+void Comp::decompress(int index){
+    if(index >= this->ids->size()){
+        //if(condition->eval())
+        this->decompressedExpr->add(this->expression->eval());
+    }else{
+        IntervalSet* range = ((this->ids->at(index))->second)->getSet();
+        for (IntervalSet::value_iterator it = range->value_begin(),
+                        end = range->value_end(); it != end; ++it) {
+            SymbolTable::getInstance().localInsert((
+                        this->ids->at(index))->first->toString(),
+                        new Symbol(
+                            new Literal(
+                                        ((this->ids->at(index))->second)->getDomain(),
+                                        *it)
+                            )
+                        );
+        this->decompress(index+1);
+        }
+    }
 }
 
 void Comp::interpret(){}

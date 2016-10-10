@@ -25,6 +25,18 @@ Symbol::Symbol(){
     return;
 }
 
+Symbol::Symbol(Literal* lit){
+    type = LIT;
+    domain = lit->getDomain();
+    if(domain == ID){
+        id = new string(lit->toString());    
+    }else{
+        setValue(lit);
+    }
+    index = NULL;
+    range = new IntervalSet(Interval(DNumber::minus_inf, DNumber::plus_inf));
+}
+
 Symbol::~Symbol(){
     //TODO::
     return;
@@ -105,6 +117,7 @@ void Symbol::decideName(string name,DNumber i,DNumber j,DNumber k){
 }
 
 void Symbol::printRange(string name, bool isArray, DNumber i,DNumber j,DNumber k, IntervalSet* range){
+    std::cout << *range << std::endl;
     if(! isArray){
         std::cout << "(assert (and (<= "
                   << range->lower().to_str() << " "
@@ -198,7 +211,26 @@ void SymbolTable::globalInsert(Symbol* symbol, Expr_node* expr){
     globalTable->insert(symbol->getID(), symbol);
 }
 
+void SymbolTable::deleteLocalTable(){
+    localTable->pop_back();
+}
+
+void SymbolTable::newLocalTable(){
+    localTable->push_back(new HashTable());
+}
+
+void SymbolTable::localInsert(std::string key, Symbol* value){
+    (localTable->back())->insert(key, value);
+}
+
 Symbol* SymbolTable::get(std::string key){
     //TODO:: consider local environments
+    Symbol* tmp;
+    //for (vector<HashTable*>::iterator it = localTable->end(); it != localTable->begin(); it--){
+    for (vector<HashTable*>::iterator it = localTable->begin(); it != localTable->end(); it++){
+        tmp = (*it)->get(key);
+        if(tmp != NULL)
+            return tmp;
+    }
     return globalTable->get(key);
 }
