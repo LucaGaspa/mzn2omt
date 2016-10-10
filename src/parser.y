@@ -16,7 +16,7 @@
 %}
 
 %union {
-    char* var;
+  char* var;
   Expr_node* expr;
   Symbol* symbol;
   std::queue<Symbol*>* symbolList;
@@ -134,7 +134,8 @@
 
 //%type <var> MZN_BOOL_LITERAL
 %type <expr> expr_atom_head set_expr expr expr_list expr_list_head set_literal
-%type <expr> comp_tail generator_list generator_list_head generator id_list id_list_head set_comp
+%type <expr> comp_tail generator_list generator_list_head generator id_list id_list_head
+%type <expr> set_comp
 %type <symbol> base_ti_expr_tail base_ti_expr ti_expr ti_expr_and_id
 %type <symbolList> ti_expr_list ti_expr_list_head
 
@@ -391,7 +392,6 @@ base_ti_expr_tail:
       } 
      | set_expr
       {
-        //$1->interpret();
         $$ = new Symbol();
         $$->setRange(((Set*)$1)->getDomain(),((Set*)$1)->exportRange());
         delete $1;
@@ -421,17 +421,14 @@ expr_list_head :
 
 set_expr :
       expr_atom_head
-      {
-        $$ = $1;
-      }
+      {$$ = $1;}
     | set_expr MZN_COLONCOLON expr_atom_head
       {
         //NOT SUPPORTED
       }
     | set_expr MZN_UNION set_expr
       {
-        //TODO:: $$ = new Set(MZN_UNION,$1,$3);
-        $$ = new Set(MZN_UNION, $1, $3)
+        $$ = new Set(MZN_UNION, $1, $3);
       } 
      | set_expr MZN_DIFF set_expr
       {
@@ -650,7 +647,13 @@ expr_atom_head :
       }
     | MZN_IDENTIFIER
       {
-        $$ = new Literal(ID,$1);
+        Literal* tmp = new Literal(ID,$1);
+        Symbol* s = SymbolTable::getInstance().get(tmp->toString());
+        if(s == NULL){
+          $$ = tmp;
+        }else{
+          $$ = s->getValue();
+        } 
         delete $1;
       }
     | MZN_IDENTIFIER array_access_tail

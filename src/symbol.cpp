@@ -117,7 +117,6 @@ void Symbol::decideName(string name,DNumber i,DNumber j,DNumber k){
 }
 
 void Symbol::printRange(string name, bool isArray, DNumber i,DNumber j,DNumber k, IntervalSet* range){
-    std::cout << *range << std::endl;
     if(! isArray){
         std::cout << "(assert (and (<= "
                   << range->lower().to_str() << " "
@@ -227,7 +226,7 @@ Symbol* SymbolTable::get(std::string key){
     //TODO:: consider local environments
     Symbol* tmp;
     //for (vector<HashTable*>::iterator it = localTable->end(); it != localTable->begin(); it--){
-    for (vector<HashTable*>::iterator it = localTable->begin(); it != localTable->end(); it++){
+    for (vector<HashTable*>::reverse_iterator it = localTable->rbegin(); it != localTable->rend(); it++){
         tmp = (*it)->get(key);
         if(tmp != NULL)
             return tmp;
