@@ -23,6 +23,10 @@ void ExprList::add(Expr_node* el){
 	element->push_back(el);
 }
 
+Expr_node* ExprList::at(int index){
+	return element->at(index);
+}
+
 std::vector<Expr_node*>* ExprList::getValues(){
 	return element;
 }

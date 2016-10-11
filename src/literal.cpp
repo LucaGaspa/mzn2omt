@@ -44,14 +44,42 @@ Literal::Literal(DOMAIN_TYPE d, DNumber lit){
 }
 
 void Literal::interpret(){
-	//TODO:: if(index != NULL) --> return printName();
+	string name = this->id;
+	DNumber i = DNumber(0);
+	DNumber j = DNumber(0);
+	DNumber k = DNumber(0);
+	if(index){
+		std::vector<Expr_node*>* v = index->getValues();
+		switch(v->size()){
+			case 3:
+				k = ((Literal*) v->at(2)->eval())->getValue();
+			case 2:
+				j = ((Literal*) v->at(1)->eval())->getValue(); 
+			case 1:
+				i = ((Literal*) v->at(0)->eval())->getValue();
+		}
+		name = SymbolTable::getInstance().printName(name, i, j, k);
+	}
+
+
 	if(domain == ID){
 		Symbol* sym = SymbolTable::getInstance().get(this->id);
 		if(sym != NULL){
-			Literal* tmp = (Literal*) sym->getValue();
-			std::cout << tmp->toString();
+			if(index != NULL){
+				Expr_node* tmp = sym->getValue();
+				if(tmp){
+					std::vector<Expr_node*>* val = ((ExprList*) tmp)->getValues();
+					int index = atoi(i.to_str().c_str());
+					val->at(index)->interpret();
+				}else{
+					std::cout << name;
+				}
+			}else{
+				Literal* tmp = (Literal*)((Literal*) sym->getValue())->eval();
+				std::cout << tmp->toString();
+			}
 		}else{
-			std::cout << id;
+			std::cout << name;
 		}
 	}else{
 		std::cout << value.to_str();
@@ -63,7 +91,7 @@ Expr_node* Literal::eval(){
 	if(domain == ID){
 		Symbol* tmp = SymbolTable::getInstance().get(this->id);
 		if(tmp != NULL){
-			return tmp->getValue();
+			return tmp->getValue()->eval();
 		}else{
 			std::cerr << "id: " << this->id << std::endl;
 			std::cerr << "LITERAL EVAL ERROR -- literal.cpp" << std::endl;
@@ -78,6 +106,14 @@ DOMAIN_TYPE Literal::getDomain() const{
 
 DNumber Literal::getValue() const{
 	return value;
+}
+
+void Literal::addIndex(Expr_node* exp){
+	if(!index){
+		index = (ExprList*) exp;
+	}else{
+		index->add(exp);
+	}
 }
 
 string Literal::toString() const{

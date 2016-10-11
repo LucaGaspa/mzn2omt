@@ -18,7 +18,7 @@
 #include <queue> 
 #include <string>
 #include <stack>
-#include <stdarg.h> 
+#include <stdarg.h>
 #include "intervalSetLib/number.h"
 #include "intervalSetLib/intervalset.h"
 
@@ -75,6 +75,7 @@ public:
 	Expr_node* eval();
 
 	void add(Expr_node* el);
+	Expr_node* at(int index);
 	std::vector<Expr_node*>* getValues();
 };
 
@@ -106,6 +107,7 @@ public:
 	string toString() const;
 	DOMAIN_TYPE getDomain() const;
 	DNumber getValue() const;
+	void addIndex(Expr_node* exp);
 };
 
 class Set: public Expr_node {
@@ -274,6 +276,7 @@ class SymbolTable
         void localInsert(string key, Symbol* value);
 
         Symbol* get(string key);
+        string printName(string name,DNumber i,DNumber j,DNumber k);
 };
 
 #endif

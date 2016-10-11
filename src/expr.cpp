@@ -287,8 +287,6 @@ Expr_node* Expr::eval(){
             std::cerr << "Not supported expr encoding: expr.cpp" << std::endl;
             break;
         case MZN_DOTDOT:
-            //TODO:: choose an encoding
-            //std::cerr << "Not supported expr encoding: expr.cpp 16" << std::endl;
             res = new Set(MZN_DOTDOT,op1,op2);
             break;
         case MZN_DOTDOT_QUOTED:

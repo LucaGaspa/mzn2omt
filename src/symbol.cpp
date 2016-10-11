@@ -63,7 +63,7 @@ void Symbol::setValue(Expr_node* expr){
 
 Expr_node* Symbol::getValue(){
     if(value != NULL){
-        return value->eval();
+        return value;
     }else{
         //return new Literal(domain, id->c_str());
         return NULL;
@@ -232,4 +232,8 @@ Symbol* SymbolTable::get(std::string key){
             return tmp;
     }
     return globalTable->get(key);
+}
+
+string SymbolTable::printName(string name,DNumber i,DNumber j,DNumber k){
+    return name + "__" + i.to_str() + "__" + j.to_str() + "__" + k.to_str();
 }

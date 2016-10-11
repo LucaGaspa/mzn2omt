@@ -135,7 +135,8 @@
 //%type <var> MZN_BOOL_LITERAL
 %type <expr> expr_atom_head set_expr expr expr_list expr_list_head set_literal
 %type <expr> comp_tail generator_list generator_list_head generator id_list id_list_head
-%type <expr> set_comp
+%type <expr> set_comp simple_array_literal simple_array_literal_2d simple_array_literal_2d_list
+%type <expr> simple_array_comp array_access_tail
 %type <symbol> base_ti_expr_tail base_ti_expr ti_expr ti_expr_and_id
 %type <symbolList> ti_expr_list ti_expr_list_head
 
@@ -428,7 +429,7 @@ set_expr :
             if(s == NULL){
               $$ = tmp;
             }else{
-              $$ = s->getValue();
+              $$ = s->getValue()->eval();
             }
         }else{
             $$ = tmp;
@@ -664,9 +665,10 @@ expr_atom_head :
       }
     | MZN_IDENTIFIER array_access_tail
       {
-        //$$ = new Literal(ID,$1);
-        //delete $1;
-        //$$->setAccessIndex($2);
+        Literal* tmp = new Literal(ID,$1);
+        delete $1;
+        tmp->addIndex($2);
+        $$ = tmp;
       }
     | MZN_UNDERSCORE
       {
@@ -712,15 +714,21 @@ expr_atom_head :
     | set_comp array_access_tail
       { /* TODO:: */ }
     | simple_array_literal
-      { /* TODO:: */ }
+      {
+        $$ = $1;
+      }
     | simple_array_literal array_access_tail
       { /* TODO:: */ }
     | simple_array_literal_2d
-      { /* TODO:: */ }
+      {
+        $$ = $1;
+      }
     | simple_array_literal_2d array_access_tail
       { /* TODO:: */ }
     | simple_array_comp
-      { /* TODO:: */ }
+      {
+        $$ = $1;
+      }
     | simple_array_comp array_access_tail
       { /* TODO:: */ }
     | if_then_else_expr
@@ -748,9 +756,15 @@ string_quote_rest:
 
 array_access_tail :
       MZN_LEFT_BRACKET expr_list MZN_RIGHT_BRACKET
-      { /* TODO:: */ }
+      {
+        $$ = $2;
+      }
     | array_access_tail MZN_LEFT_BRACKET expr_list MZN_RIGHT_BRACKET
-      { /* TODO:: */ }
+      {
+        ExprList* tmp = (ExprList*) $1;
+        tmp->add($3);
+        $$ = tmp;
+      }
 
 set_literal :
       '{' '}'
@@ -822,17 +836,27 @@ id_list_head :
 
 simple_array_literal : 
       MZN_LEFT_BRACKET MZN_RIGHT_BRACKET
-      { /* TODO:: */ }
+      {
+        $$ = new ExprList();
+      }
     | MZN_LEFT_BRACKET expr_list MZN_RIGHT_BRACKET
-      { /* TODO:: */ }
+      {
+        $$ = $2;
+      }
 
 simple_array_literal_2d :
       MZN_LEFT_2D_BRACKET MZN_RIGHT_2D_BRACKET
-      { /* TODO:: */ }
+      {
+        $$ = new ExprList();
+      }
     | MZN_LEFT_2D_BRACKET simple_array_literal_2d_list MZN_RIGHT_2D_BRACKET
-      { /* TODO:: */ }
+      {
+        $$ = $2;
+      }
     | MZN_LEFT_2D_BRACKET simple_array_literal_2d_list '|' MZN_RIGHT_2D_BRACKET
-      { /* TODO:: */ }
+      {
+        $$ = $2;
+      }
     | MZN_LEFT_2D_BRACKET simple_array_literal_3d_list MZN_RIGHT_2D_BRACKET
       { /* TODO:: */ }
 
@@ -846,13 +870,22 @@ simple_array_literal_3d_list :
 
 simple_array_literal_2d_list :
       expr_list
-      { /* TODO:: */ }
+      {
+        $$ = new ExprList();
+        ((ExprList*) $$)->add($1);
+      }
     | simple_array_literal_2d_list '|' expr_list
-      { /* TODO:: */ }
+      {
+        $$ = $1;
+        ((ExprList*) $$)->add($3);
+      }
 
 simple_array_comp :
       MZN_LEFT_BRACKET expr '|' comp_tail MZN_RIGHT_BRACKET
-      { /* TODO:: */ }
+      {
+        ((Comp*)$4)->setExpression($2);
+        $$ = ($4)->eval();
+      }
 
 if_then_else_expr :
       MZN_IF expr MZN_THEN expr elseif_list MZN_ELSE expr MZN_ENDIF
