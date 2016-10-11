@@ -421,7 +421,19 @@ expr_list_head :
 
 set_expr :
       expr_atom_head
-      {$$ = $1;}
+      {
+        Expr_node* tmp = $1;
+        if(dynamic_cast<Literal*>(tmp)){
+            Symbol* s = SymbolTable::getInstance().get(((Literal*)tmp)->toString());    
+            if(s == NULL){
+              $$ = tmp;
+            }else{
+              $$ = s->getValue();
+            }
+        }else{
+            $$ = tmp;
+        }
+      }
     | set_expr MZN_COLONCOLON expr_atom_head
       {
         //NOT SUPPORTED
@@ -647,13 +659,7 @@ expr_atom_head :
       }
     | MZN_IDENTIFIER
       {
-        Literal* tmp = new Literal(ID,$1);
-        Symbol* s = SymbolTable::getInstance().get(tmp->toString());
-        if(s == NULL){
-          $$ = tmp;
-        }else{
-          $$ = s->getValue();
-        } 
+        $$ = new Literal(ID,$1);
         delete $1;
       }
     | MZN_IDENTIFIER array_access_tail
