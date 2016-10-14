@@ -68,7 +68,32 @@ Expr_node* Symbol::getValue(){
         //return new Literal(domain, id->c_str());
         return NULL;
     }
-    
+}
+
+bool Symbol::hasValue(){
+    if(value){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+Expr_node* Symbol::getValue_at(int i){
+    if(value){
+        return value->at(i - atoi(index->at(0)->lower().to_str().c_str()));
+    }else{
+        return NULL;
+    }
+}
+
+Expr_node* Symbol::getValue_at(int i, int j){
+    if(value){
+        ExprList* tmp = (ExprList*) value->at(i - atoi(index->at(0)->lower().to_str().c_str()));
+        ExprList* tmp_i = (ExprList*) tmp->at(0); //??Parser initialize too many innested ExprList??
+        return tmp_i->at(j - atoi(index->at(1)->lower().to_str().c_str()));
+    }else{
+        return NULL;
+    }
 }
 
 void Symbol::importIndexes(std::queue<Symbol*>* list){

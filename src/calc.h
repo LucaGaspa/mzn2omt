@@ -75,8 +75,9 @@ public:
 	Expr_node* eval();
 
 	void add(Expr_node* el);
+	int size();
 	Expr_node* at(int index);
-	std::vector<Expr_node*>* getValues();
+	//std::vector<Expr_node*>* getValues();
 };
 
 
@@ -215,7 +216,10 @@ public:
 	inline DOMAIN_TYPE getDomain(){return domain;};
 	inline string getID(){return *id;};
 
+	bool hasValue();
 	Expr_node* getValue();
+	Expr_node* getValue_at(int i);
+	Expr_node* getValue_at(int i, int j);
 
 	void importIndexes(queue<Symbol*>* ind);
 	IntervalSet* exportIndex();

@@ -48,42 +48,36 @@ void Literal::interpret(){
 	DNumber i = DNumber(0);
 	DNumber j = DNumber(0);
 	DNumber k = DNumber(0);
-	std::vector<Expr_node*>* v;
+	//std::vector<Expr_node*>* v;
 
 	if(index){
-		v = index->getValues();
-		switch(v->size()){
+		switch(index->size()){
 			case 3:
-				k = ((Literal*) v->at(2)->eval())->getValue();
+				k = ((Literal*) index->at(2)->eval())->getValue();
 			case 2:
-				j = ((Literal*) v->at(1)->eval())->getValue(); 
+				j = ((Literal*) index->at(1)->eval())->getValue(); 
 			case 1:
-				i = ((Literal*) v->at(0)->eval())->getValue();
+				i = ((Literal*) index->at(0)->eval())->getValue();
 		}
 		name = SymbolTable::getInstance().printName(name, i, j, k);
 	}
 
 	if(domain == ID){
 		Symbol* sym = SymbolTable::getInstance().get(this->id);
-		if(sym != NULL){
-			if(index != NULL){
-				Expr_node* tmp = sym->getValue();
-				if(tmp){
-					std::vector<Expr_node*>* val = ((ExprList*) tmp)->getValues();
-					//TODO:: 3d arrays??
-					if(v->size() == 1){
-						int index = atoi(i.to_str().c_str());
-						val->at(index)->interpret();
+		if(sym){
+			if(index){
+				if(sym->hasValue()){
+					if(index->size() == 1){
+						int i_int = atoi(i.to_str().c_str());
+						sym->getValue_at(i_int)->interpret();
 					}else{
-						int index_1 = atoi(i.to_str().c_str());
-						int index_2 = atoi(j.to_str().c_str());
-						ExprList* row = (ExprList*) ((ExprList*) tmp)->at(index_1);
-						ExprList* col = (ExprList*) row->at(0);
-						Expr_node* el = col->at(index_2);
-						el->interpret();
+						int i_int = atoi(i.to_str().c_str());
+						int j_int = atoi(j.to_str().c_str());
+
+						sym->getValue_at(i_int,j_int)->interpret();
 					}
 				}else{
-					std::cout << name;
+					std::cout << name;	
 				}
 			}else{
 				Literal* tmp = (Literal*)((Literal*) sym->getValue())->eval();

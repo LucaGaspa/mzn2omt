@@ -322,7 +322,7 @@ ti_expr :
              {
               $$ = $6;
               $6->importIndexes($3);
-
+              //TODO:: Adjust array OFFSET!! array[1..5]: x -> x[1 (-1)] 
              } 
      | MZN_LIST MZN_OF base_ti_expr
              { } 

@@ -24,9 +24,9 @@ Set::Set(Expr_node* a){
 	Expr_node* tmp;
 	//ExprList used as box for a vector of values
 	//to keep logic inside ExprList should implement wrapper for vector
-	std::vector<Expr_node*>* v = ((ExprList*)a)->getValues();
-	for (vector<Expr_node*>::iterator it = v->begin(); it != v->end(); it++){
-		tmp = (*it)->eval();
+	ExprList* list = (ExprList*) a;
+	for(int i = 0; i < list->size(); i++){
+		tmp = list->at(i);
 		this->domain = ((Literal*) tmp)->getDomain();
 		set->add(Interval(((Literal*) tmp)->getValue()));
 	}

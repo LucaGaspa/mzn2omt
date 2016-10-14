@@ -23,13 +23,17 @@ void ExprList::add(Expr_node* el){
 	element->push_back(el);
 }
 
+int ExprList::size(){
+	return element->size();
+}
+
 Expr_node* ExprList::at(int index){
 	return element->at(index);
 }
 
-std::vector<Expr_node*>* ExprList::getValues(){
+/*std::vector<Expr_node*>* ExprList::getValues(){
 	return element;
-}
+}*/
 
 void ExprList::interpret(){
 	//DEBUG PURPOSE

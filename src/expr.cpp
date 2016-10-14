@@ -356,14 +356,12 @@ Comp::Comp(Expr* e){
     condition = NULL;
     ids = new std::vector<pair<Literal*,Set*>*>();
     
-    Expr_node* op1 = e->getOp_1();
-    Expr_node* op2 = e->getOp_2();
+    ExprList* op1 = (ExprList*) ((Expr*) e)->getOp_1();
+    Expr_node* op2 = ((Expr*) e)->getOp_2();
     op2 = op2->eval();
 
-    std::vector<Expr_node*>* v = ((ExprList*)op1)->getValues();
-
-    for (vector<Expr_node*>::iterator it = v->begin(); it != v->end(); it++){
-        ids->push_back(new pair<Literal*,Set*>((Literal*)(*it), (Set*)op2));
+    for(int i=0; i < op1->size(); i++){
+        ids->push_back(new pair<Literal*,Set*>((Literal*)(op1->at(i)), (Set*)op2));
     }
 }
 
@@ -378,14 +376,12 @@ void Comp::setExpression(Expr_node* e){
 
 void Comp::add(Expr_node* e){
     //TODO::check if e is an Expr or a literal
-    Expr_node* op1 = ((Expr*)e)->getOp_1();
-    Expr_node* op2 = ((Expr*)e)->getOp_2();
-    op2 = op2->eval();
+    ExprList* op1 = (ExprList*) ((Expr*) e)->getOp_1();
+    Expr_node* op2 = ((Expr*) e)->getOp_2();
+    op2 = op2->eval(); //TODO:: Memory leak??
 
-    std::vector<Expr_node*>* v = ((ExprList*)op1)->getValues();
-
-    for (vector<Expr_node*>::iterator it = v->begin(); it != v->end(); it++){
-        ids->push_back(new pair<Literal*,Set*>((Literal*)(*it), (Set*)op2));
+    for(int i=0; i < op1->size(); i++){
+        ids->push_back(new pair<Literal*,Set*>((Literal*)(op1->at(i)), (Set*)op2));
     }
 }
 
@@ -412,8 +408,13 @@ void Comp::initDecompression(){
 
 void Comp::decompress(int index){
     if(index >= this->ids->size()){
-        //if(condition->eval())
-        this->decompressedExpr->add(this->expression->eval());
+        if(condition){
+            if(atoi( ((Literal*)condition->eval())->getValue().to_str().c_str() )){
+                this->decompressedExpr->add(this->expression->eval());
+            }
+        }else{
+            this->decompressedExpr->add(this->expression->eval());
+        }
     }else{
         IntervalSet* range = ((this->ids->at(index))->second)->getSet();
         for (IntervalSet::value_iterator it = range->value_begin(),
