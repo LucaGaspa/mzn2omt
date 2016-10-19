@@ -409,7 +409,6 @@ void Comp::initDecompression(){
 void Comp::decompress(int index){
     if(index >= this->ids->size()){
         if(condition){
-//            if(atoi( ((Literal*)condition->eval())->getValue().to_str().c_str() )){
             if(((Literal*)condition->eval())->getValue()){
                 this->decompressedExpr->add(this->expression->eval());
             }

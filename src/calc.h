@@ -167,6 +167,7 @@ public:
 	void assignSet(std::queue<Expr_node*>* id_lit, Expr_node* e);
 	void expand_args();
 
+	inline string getID(){return id;};
 	inline ExprList* getArgs(){return args;};
 	inline Expr_node* getBody(){return body;};
 	inline Expr_node* getCondition(){return condition;};

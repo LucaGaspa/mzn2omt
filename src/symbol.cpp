@@ -263,13 +263,22 @@ void delete_forall(){
 }
 
 void forall_interpret(Fun* f){
+    string id = f->getID();
     ExprList* args = f->getArgs();
     Expr_node* body = f->getBody();
     Expr_node* condition = f->getCondition();
     std::vector<pair<Literal*,Set*>*>* ids = f->getIDS();
 
     init_forall(ids);
-    std::cout << "(and ";
+    if(id.compare("forall") == 0){
+        std::cout << "(and ";
+    }else if(id.compare("alldifferent") == 0){
+        std::cout << "(distinct ";
+    }else if(id.compare("sum") == 0){
+        std::cout << "(+ ";
+    }else if(id.compare("exist") == 0){
+        std::cout << "(or ";
+    }
     cycle_forall(0,ids,body,condition);
     std::cout << ")";
     delete_forall();
@@ -284,6 +293,9 @@ SymbolTable::SymbolTable(){
     localTable = new std::vector<HashTable*>();
 
     libr_func.push_back(std::pair<std::string, fptr>("forall", forall_interpret));
+    libr_func.push_back(std::pair<std::string, fptr>("alldifferent", forall_interpret));
+    libr_func.push_back(std::pair<std::string, fptr>("sum", forall_interpret));
+    libr_func.push_back(std::pair<std::string, fptr>("exist", forall_interpret));
 }
 
 void SymbolTable::setValue(Symbol* symbol, Expr_node* expr){
