@@ -105,13 +105,13 @@ DNumber & DNumber::operator=(const DNumber &other)
     //------------------------------------
     // My constructor
     //------------------------------------
-    
+
     DNumber::DNumber(int i){
         val_ = mpq_class(i, 1);
         eps_ = mpq_class(0, 1);
     }
 
-    DNumber::DNumber(double d){
+    DNumber::DNumber(double d) {
         std::ostringstream strs;
         strs << std::setprecision(64) << d;
         std::string nstr = strs.str();
@@ -167,6 +167,12 @@ DNumber & DNumber::operator=(const DNumber &other)
         }
         return *this;
     }
+
+DNumber::operator bool() const
+{
+    return (0 != cmp(zero_, val_.get_num()))
+        && (0 != cmp(zero_, eps_.get_num()));
+};
 
     //------------------------------------
 
