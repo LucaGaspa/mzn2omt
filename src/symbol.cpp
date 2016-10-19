@@ -80,6 +80,10 @@ bool Symbol::hasValue(){
 
 Expr_node* Symbol::getValue_at(int i){
     if(value){
+        if(!index){
+            std::cout << "BAD SYMBOL ACCESS 1D" << std::endl;
+            return NULL;
+        }
         return value->at(i - atoi(index->at(0)->lower().to_str().c_str()));
     }else{
         return NULL;
@@ -88,6 +92,10 @@ Expr_node* Symbol::getValue_at(int i){
 
 Expr_node* Symbol::getValue_at(int i, int j){
     if(value){
+        if(!index){
+            std::cout << "BAD SYMBOL ACCESS 2D" << std::endl;
+            return NULL;
+        }
         ExprList* tmp = (ExprList*) value->at(i - atoi(index->at(0)->lower().to_str().c_str()));
         ExprList* tmp_i = (ExprList*) tmp->at(0); //??Parser initialize too many innested ExprList??
         return tmp_i->at(j - atoi(index->at(1)->lower().to_str().c_str()));
@@ -207,7 +215,65 @@ void Symbol::printDecl(){
     }
 }
 
+/*************
+FUNC POINTERS
+******/
 
+void init_forall(std::vector<pair<Literal*,Set*>*>* ids){
+    SymbolTable::getInstance().newLocalTable();
+    if(! ids){
+        std::cerr << "No ids in init_forall\n";
+        return;
+    }
+    for (vector<pair<Literal*,Set*>*>::iterator it = ids->begin(); it != ids->end(); it++){
+        SymbolTable::getInstance().localInsert((*it)->first->toString(), new Symbol((*it)->first));
+    }
+}
+
+void cycle_forall(int index, std::vector<pair<Literal*,Set*>*>* ids, Expr_node* body, Expr_node* condition){
+    if(index >= ids->size()){
+        if(condition){
+            if(atoi( ((Literal*)condition->eval())->getValue().to_str().c_str() )){
+                body->interpret();
+                std::cout << " ";
+            }
+        }else{
+            body->interpret();
+            std::cout << " ";
+        }
+    }else{
+        IntervalSet* range = ((ids->at(index))->second)->getSet();
+        for (IntervalSet::value_iterator it = range->value_begin(),
+                        end = range->value_end(); it != end; ++it) {
+            SymbolTable::getInstance().localInsert((
+                        ids->at(index))->first->toString(),
+                        new Symbol(
+                            new Literal(
+                                        ((ids->at(index))->second)->getDomain(),
+                                        *it)
+                            )
+                        );
+            cycle_forall(index+1,ids,body,condition);
+        }
+    }
+}
+
+void delete_forall(){
+    SymbolTable::getInstance().deleteLocalTable();
+}
+
+void forall_interpret(Fun* f){
+    ExprList* args = f->getArgs();
+    Expr_node* body = f->getBody();
+    Expr_node* condition = f->getCondition();
+    std::vector<pair<Literal*,Set*>*>* ids = f->getIDS();
+
+    init_forall(ids);
+    std::cout << "(and ";
+    cycle_forall(0,ids,body,condition);
+    std::cout << ")";
+    delete_forall();
+}
 
 //===================================================================//
 //SymbolTable
@@ -216,6 +282,8 @@ void Symbol::printDecl(){
 SymbolTable::SymbolTable(){
     globalTable = new HashTable();
     localTable = new std::vector<HashTable*>();
+
+    libr_func.push_back(std::pair<std::string, fptr>("forall", forall_interpret));
 }
 
 void SymbolTable::setValue(Symbol* symbol, Expr_node* expr){
@@ -247,8 +315,15 @@ void SymbolTable::localInsert(std::string key, Symbol* value){
     (localTable->back())->insert(key, value);
 }
 
+fptr SymbolTable::call_lib_function_interpret(string id){
+    for (vector<pair<string, fptr>>::iterator it = libr_func.begin(); it != libr_func.end(); it++){
+        if( (*it).first.compare(id) == 0){
+            return (*it).second;
+        }
+    }
+}
+
 Symbol* SymbolTable::get(std::string key){
-    //TODO:: consider local environments
     Symbol* tmp;
     //for (vector<HashTable*>::iterator it = localTable->end(); it != localTable->begin(); it--){
     for (vector<HashTable*>::reverse_iterator it = localTable->rbegin(); it != localTable->rend(); it++){

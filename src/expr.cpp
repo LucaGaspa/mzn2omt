@@ -334,7 +334,7 @@ Expr_node* Expr::eval(){
 }
 
 Expr_node* Expr::getOp_1(){
-    if(nops){
+    if(nops > 0){
         return op->at(0);
     }else{
         return NULL;
@@ -433,3 +433,67 @@ void Comp::decompress(int index){
 }
 
 void Comp::interpret(){}
+
+/*******************************
+
+   FUN CLASS
+
+*/
+
+Fun::Fun(ExprList* e){
+    args = e;
+    condition = NULL;
+    body = NULL;
+    ids = NULL;
+}
+
+Fun::Fun(ExprList* e, Expr_node* c){
+    args = e;
+    condition = c;
+    body = NULL;
+    ids = NULL;
+}
+
+void Fun::assignSet(std::queue<Expr_node*>* id_lit, Expr_node* e){
+    if(!ids){
+        ids = new std::vector<pair<Literal*,Set*>*>();
+    }
+    Expr_node* tmp;
+    while(!id_lit->empty()){
+        tmp = id_lit->front();
+        id_lit->pop();
+        Set* s = (Set*) e->eval();
+        ids->push_back(new pair<Literal*,Set*>((Literal*)(tmp), s));    
+    }
+}
+
+void Fun::expand_args(){
+    std::queue<Expr_node*>* id_lit = new std::queue<Expr_node*>();
+    for (int i = 0; i < args->size(); ++i)
+    {
+        while( ! dynamic_cast<Expr*>(args->at(i))){
+            id_lit->push(args->at(i));
+        }
+        if(dynamic_cast<Expr*>(args->at(i))){
+            Expr* e = (Expr*) args->at(i);
+            id_lit->push(e->getOp_1());
+            assignSet(id_lit, e->getOp_2());
+        }
+    }
+    delete id_lit;
+}
+
+void Fun::setBody(Expr_node* b){
+    body = b;
+    expand_args();
+}
+
+void Fun::setReference(string id){
+    this->id = id;
+}
+
+void Fun::interpret(){
+    fptr f = SymbolTable::getInstance().call_lib_function_interpret(id);
+    f(this);
+}
+Expr_node* Fun::eval(){}

@@ -31,10 +31,6 @@ Expr_node* ExprList::at(int index){
 	return element->at(index);
 }
 
-/*std::vector<Expr_node*>* ExprList::getValues(){
-	return element;
-}*/
-
 void ExprList::interpret(){
 	//DEBUG PURPOSE
 	std::cout << "ExprList printing: DEBUG PURPOSE" << std::endl;
@@ -54,6 +50,7 @@ Expr_node* ExprList::eval(){
 	if(element->size() == 1){
 		return element->front()->eval();
 	}else{
+		std::cerr << "Evaluating ExprList. Really?!?" << std::endl;
 		return this;
 	}
 }

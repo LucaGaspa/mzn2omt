@@ -136,7 +136,7 @@
 %type <expr> expr_atom_head set_expr expr expr_list expr_list_head set_literal
 %type <expr> comp_tail generator_list generator_list_head generator id_list id_list_head
 %type <expr> set_comp simple_array_literal simple_array_literal_2d simple_array_literal_2d_list
-%type <expr> simple_array_comp array_access_tail
+%type <expr> simple_array_comp array_access_tail call_expr comp_or_expr
 %type <symbol> base_ti_expr_tail base_ti_expr ti_expr ti_expr_and_id
 %type <symbolList> ti_expr_list ti_expr_list_head
 
@@ -206,6 +206,12 @@ vardecl_item :
              {
               SymbolTable::getInstance().globalInsert($1,$4);
               $1->printDecl();
+              if($1->getTi_type() == VAR || $1->getTi_type() == SETVAR){
+                Expr_node* c = new Expr(MZN_EQUIV, 2, new Literal($1->getDomain(), $1->getID()), $4);
+                std::cout << "(assert ";
+                c->interpret();
+                std::cout << ")" << std::endl;
+              }
              } 
  
 assign_item :
@@ -322,7 +328,6 @@ ti_expr :
              {
               $$ = $6;
               $6->importIndexes($3);
-              //TODO:: Adjust array OFFSET!! array[1..5]: x -> x[1 (-1)] 
              } 
      | MZN_LIST MZN_OF base_ti_expr
              { } 
@@ -738,7 +743,9 @@ expr_atom_head :
     | let_expr
       { /* TODO:: */ }
     | call_expr
-      { $$ = NULL;/* -->debug purpose, TODO:: */}
+      {
+        $$ = $1;
+      }
     | call_expr array_access_tail
       { /* NOT SUPPORTED */}
 
@@ -966,13 +973,21 @@ call_expr :
     | MZN_IDENTIFIER '(' comp_or_expr ')'
       { /* TODO:: */ }
     | MZN_IDENTIFIER '(' comp_or_expr ')' '(' expr ')'
-      { /* TODO:: */ }
+      {
+        ((Fun*) $3)->setReference(string($1));
+        ((Fun*) $3)->setBody($6);
+        $$ = $3;
+      }
 
 comp_or_expr :
       expr_list
-      { /* TODO:: */ }
+      {
+        $$ = new Fun((ExprList*) $1);
+      }
     | expr_list MZN_WHERE expr
-      { /* TODO:: */ }
+      {
+        $$ = new Fun((ExprList*) $1,$3);
+      }
 
 let_expr :
       MZN_LET '{' let_vardecl_item_list '}' MZN_IN expr %prec PREC_ANNO

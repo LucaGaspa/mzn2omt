@@ -150,14 +150,28 @@ public:
 
 class Fun: public Expr_node {
 	//Fun represents call_expr non-terminal
-	string* id; //function identifier (forall, exist, sum, ...)
+	string id; //function identifier (forall, exist, sum, ...)
 
 	//maybe ExprList args; or vector<Literal*>* args;	//args
+	std::vector<pair<Literal*,Set*>*>* ids;
 	ExprList* args;				//args
 	Expr_node* body;			//body (actually a free-standing parse tree)
 	Expr_node* condition;		//example where condition in forall
 
 public:
+	Fun(ExprList* e);
+	Fun(ExprList* e, Expr_node* c);
+
+	void setBody(Expr_node* b);
+	void setReference(string id);
+	void assignSet(std::queue<Expr_node*>* id_lit, Expr_node* e);
+	void expand_args();
+
+	inline ExprList* getArgs(){return args;};
+	inline Expr_node* getBody(){return body;};
+	inline Expr_node* getCondition(){return condition;};
+	inline std::vector<pair<Literal*,Set*>*>* getIDS(){return ids;};
+
 	void interpret();
 	Expr_node* eval();
 };
@@ -215,6 +229,7 @@ public:
 
 	inline DOMAIN_TYPE getDomain(){return domain;};
 	inline string getID(){return *id;};
+	inline TI_TYPE getTi_type(){return ti_type;};
 
 	bool hasValue();
 	Expr_node* getValue();
@@ -244,6 +259,7 @@ public:
 
 };//*/
 
+typedef void (*fptr)(Fun*);
 class SymbolTable
 {
 	//Singleton paradigm
@@ -257,6 +273,8 @@ class SymbolTable
     private:
         HashTable* globalTable;					//table for global variables
         std::vector<HashTable*>* localTable;	//vector for each local table
+
+        std::vector<std::pair<std::string, fptr>> libr_func;
 
         //Singleton methods
         SymbolTable();
@@ -279,8 +297,12 @@ class SymbolTable
         void newLocalTable();
         void localInsert(string key, Symbol* value);
 
+        fptr call_lib_function_interpret(string id);
+
         Symbol* get(string key);
         string printName(string name,DNumber i,DNumber j,DNumber k);
+
+
 };
 
 #endif
