@@ -171,7 +171,7 @@ DNumber & DNumber::operator=(const DNumber &other)
 DNumber::operator bool() const
 {
     return (0 != cmp(zero_, val_.get_num()))
-        && (0 != cmp(zero_, eps_.get_num()));
+        || (0 != cmp(zero_, eps_.get_num()));
 };
 
     //------------------------------------
