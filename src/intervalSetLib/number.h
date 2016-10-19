@@ -59,7 +59,10 @@ public:
     bool operator ==(const DNumber &other) const;
     DNumber & operator+=(const DNumber &other);
 
+    explicit operator bool() const;
+
     //------------------------------------
+
     virtual ~DNumber();
 
     bool is_inf() const;
@@ -72,7 +75,7 @@ public:
     std::string to_str() const;
     std::string integral_repr() const;
     std::string epsilon_repr() const;
-    
+
     static const DNumber plus_inf;
     static const DNumber minus_inf;
 
