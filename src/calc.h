@@ -231,6 +231,8 @@ public:
 	inline DOMAIN_TYPE getDomain(){return domain;};
 	inline string getID(){return *id;};
 	inline TI_TYPE getTi_type(){return ti_type;};
+	inline int getIndexSize(){return index->size();};
+	inline std::vector<IntervalSet*>* getIndexes(){return index;};
 
 	bool hasValue();
 	Expr_node* getValue();

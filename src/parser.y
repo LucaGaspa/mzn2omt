@@ -232,11 +232,26 @@ constraint_item :
  
 solve_item :
       MZN_SOLVE annotations MZN_SATISFY
-             { } 
+             {
+              std::cout << "(check-sat)\n";
+              std::cout << "(get-model)\n";
+             } 
      | MZN_SOLVE annotations MZN_MINIMIZE expr
-             { } 
+             {
+              std::cout << "(minimize ";
+              $4->interpret();
+              std::cout << ")\n";
+              std::cout << "(check-sat)\n";
+              std::cout << "(get-model)\n";
+             } 
      | MZN_SOLVE annotations MZN_MAXIMIZE expr
-             { } 
+             {
+              std::cout << "(maximize ";
+              $4->interpret();
+              std::cout << ")\n";
+              std::cout << "(check-sat)\n";
+              std::cout << "(get-model)\n";
+             } 
  
 output_item :
       MZN_OUTPUT expr
@@ -971,7 +986,10 @@ call_expr :
     | quoted_op_call
       { /* NOT SUPPORTED */ }
     | MZN_IDENTIFIER '(' comp_or_expr ')'
-      { /* TODO:: */ }
+      {
+        ((Fun*) $3)->setReference(string($1));
+        $$ = $3;
+      }
     | MZN_IDENTIFIER '(' comp_or_expr ')' '(' expr ')'
       {
         ((Fun*) $3)->setReference(string($1));

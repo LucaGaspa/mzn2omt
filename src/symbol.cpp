@@ -284,6 +284,38 @@ void forall_interpret(Fun* f){
     delete_forall();
 }
 
+void count_interpret(Fun* f){
+    string id = f->getID();
+    ExprList* args = f->getArgs();
+
+    Symbol* ident = SymbolTable::getInstance().get(((Literal*) args->at(0))->toString());
+    string id_sum = "pbsum_" + ident->getID();
+    
+    if(! ident){
+        std::cerr << "Count Error:: No symbol found" << std::endl;
+    }
+    if(ident->getIndexSize() != 1){
+        std::cerr << "Count Error:: Wrong array indexes" << std::endl;
+    }else{
+        std::cout << "\r";
+        IntervalSet* index = ident->getIndexes()->at(0);
+        for (IntervalSet::value_iterator it = index->value_begin(),
+                        end = index->value_end(); it != end; ++it) {
+            std::cout << "(assert-soft (not (= ";
+                      f->getArgs()->at(1)->interpret();
+            std::cout << " "
+                      <<  SymbolTable::getInstance().printName(ident->getID(), *it, 0,0)
+                      << ")) :id "
+                      << id_sum << ")\n";
+        }
+    }
+
+    std::cout << "(assert "
+              << "(= " << id_sum << " ";
+    f->getArgs()->at(2)->interpret();
+    std::cout << ")";
+}
+
 //===================================================================//
 //SymbolTable
 //===================================================================//
@@ -296,6 +328,7 @@ SymbolTable::SymbolTable(){
     libr_func.push_back(std::pair<std::string, fptr>("alldifferent", forall_interpret));
     libr_func.push_back(std::pair<std::string, fptr>("sum", forall_interpret));
     libr_func.push_back(std::pair<std::string, fptr>("exist", forall_interpret));
+    libr_func.push_back(std::pair<std::string, fptr>("count", count_interpret));
 }
 
 void SymbolTable::setValue(Symbol* symbol, Expr_node* expr){
@@ -333,6 +366,7 @@ fptr SymbolTable::call_lib_function_interpret(string id){
             return (*it).second;
         }
     }
+    return NULL;
 }
 
 Symbol* SymbolTable::get(std::string key){

@@ -494,6 +494,8 @@ void Fun::setReference(string id){
 
 void Fun::interpret(){
     fptr f = SymbolTable::getInstance().call_lib_function_interpret(id);
-    f(this);
+    if(f){
+        f(this);
+    }
 }
 Expr_node* Fun::eval(){}
