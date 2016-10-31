@@ -233,7 +233,7 @@ void init_forall(std::vector<pair<Literal*,Set*>*>* ids){
 void cycle_forall(int index, std::vector<pair<Literal*,Set*>*>* ids, Expr_node* body, Expr_node* condition){
     if(index >= ids->size()){
         if(condition){
-            if(atoi( ((Literal*)condition->eval())->getValue().to_str().c_str() )){
+            if( ((Literal*)condition->eval())->getValue() ){
                 body->interpret();
                 std::cout << " ";
             }
@@ -297,7 +297,7 @@ void count_interpret(Fun* f){
     if(ident->getIndexSize() != 1){
         std::cerr << "Count Error:: Wrong array indexes" << std::endl;
     }else{
-        std::cout << "\r";
+        std::cout << "\r"; //delete "(assert " string coming from parser default
         IntervalSet* index = ident->getIndexes()->at(0);
         for (IntervalSet::value_iterator it = index->value_begin(),
                         end = index->value_end(); it != end; ++it) {

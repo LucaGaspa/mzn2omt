@@ -53,9 +53,14 @@ public:
     DNumber & operator+(const int other) const;
     DNumber & operator-(const DNumber &other) const;
     DNumber & operator-(const int other) const;
+    DNumber & operator*(const DNumber &other) const;
+    DNumber & operator*(const int other) const;
+    DNumber & operator/(const DNumber &other) const;
+    DNumber & operator/(const int other) const;
     bool operator>(const DNumber &other) const;
     bool operator<(const DNumber &other) const;
     bool operator<=(const DNumber &other) const;
+    bool operator>=(const DNumber &other) const;
     bool operator ==(const DNumber &other) const;
     DNumber & operator+=(const DNumber &other);
 

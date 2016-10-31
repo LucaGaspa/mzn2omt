@@ -251,7 +251,7 @@ Expr_node* Expr::eval(){
             res = &(*((Literal*)op1) <= *((Literal*)op2));
             break;
         case MZN_GQ:
-            //res = &(*op1 >= *op2);
+            res = &(*((Literal*)op1) >= *((Literal*)op2));
             break;
         case MZN_EQ:
             res = &(*((Literal*)op1) == *((Literal*)op2));
@@ -309,10 +309,10 @@ Expr_node* Expr::eval(){
             res = &(*((Literal*)op1) - *((Literal*)op2));
             break;
         case MZN_MULT:
-            //res = &(*op1 * *op2);
+            res = &(*((Literal*)op1) * *((Literal*)op2));
             break;
         case MZN_DIV:
-            //res = &(*op1 / *op2);
+            res = &(*((Literal*)op1) / *((Literal*)op2));
             break;
         case MZN_IDIV:
             //res = &(*op1 / *op2);

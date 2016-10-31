@@ -148,6 +148,22 @@ DNumber & DNumber::operator=(const DNumber &other)
         DNumber* tmp = new DNumber(val_ - other, eps_);
         return *tmp;
     }
+    DNumber & DNumber::operator*(const DNumber &other) const{
+        DNumber* tmp = new DNumber(val_ * other.val_, eps_ * other.eps_);
+        return *tmp;
+    }
+    DNumber & DNumber::operator*(const int other) const{
+        DNumber* tmp = new DNumber(val_ * other, eps_);
+        return *tmp;
+    }
+    DNumber & DNumber::operator/(const DNumber &other) const{
+        DNumber* tmp = new DNumber(val_ / other.val_, eps_ / other.eps_);
+        return *tmp;
+    }
+    DNumber & DNumber::operator/(const int other) const{
+        DNumber* tmp = new DNumber(val_ / other, eps_);
+        return *tmp;
+    }
     bool DNumber::operator>(const DNumber &other) const{
         return compare(*this, other) > 0;
     }
@@ -156,6 +172,9 @@ DNumber & DNumber::operator=(const DNumber &other)
     }
     bool DNumber::operator<=(const DNumber &other) const{
         return compare(*this, other) <= 0;
+    }
+    bool DNumber::operator>=(const DNumber &other) const{
+        return compare(*this, other) >= 0;
     }
     bool DNumber::operator ==(const DNumber &other) const{
         return compare(*this, other) == 0;

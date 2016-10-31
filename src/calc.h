@@ -95,13 +95,14 @@ public:
 
 	Literal& operator +(const Literal& other) const;
 	Literal& operator -(const Literal & other) const;
+	Literal& operator *(const Literal & other) const;
+	Literal& operator /(const Literal & other) const;
 	Literal& operator <(const Literal & other) const;
 	Literal& operator <=(const Literal & other) const;
 	Literal& operator >(const Literal & other) const;
+	Literal& operator >=(const Literal & other) const;
 	Literal& operator ==(const Literal & other) const;
-	//Literal& operator *(const Literal & other) const;	//Not yet implemented
-	//Literal& operator /(const Literal & other) const;	//Not yet implemented
-
+	
 	void interpret();
 	Expr_node* eval();
 

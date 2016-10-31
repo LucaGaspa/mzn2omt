@@ -489,23 +489,19 @@ set_expr :
       }
     | set_expr MZN_PLUS set_expr
       {
-        //$$ = new Expr(MZN_PLUS,2,$1,$3);
+        $$ = new Expr(MZN_PLUS,2,$1,$3);
       }
     | set_expr MZN_MINUS set_expr
       {
-        //$$ = new Expr(MZN_MINUS,2,$1,$3);
+        $$ = new Expr(MZN_MINUS,2,$1,$3);
       }
     | set_expr MZN_MULT set_expr
       {
-        //TODO::
-        std::cerr << "Not implemented mult" << std::endl;
-        exit(0);
+        $$ = new Expr(MZN_MULT,2,$1,$3); 
       }
     | set_expr MZN_DIV set_expr
       {
-        //TODO::
-        std::cerr << "Not implemented div" << std::endl;
-        exit(0);
+        $$ = new Expr(MZN_DIV,2,$1,$3);
       }
     | set_expr MZN_IDIV set_expr
       {
