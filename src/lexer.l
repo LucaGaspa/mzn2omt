@@ -67,13 +67,17 @@
 %[^\xa]*          { /* ignore comments */ }
 
 "true"            { 
-                    yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
-                    strcpy(yylval.var, yytext);
+                    //yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+                    //strcpy(yylval.var, yytext);
                     //free(yytext);
+                    yylval.var = (char*) malloc(sizeof(char)+2);
+                    strcpy(yylval.var, "1");
                     return MZN_BOOL_LITERAL; }
 "false"           { 
-                    yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
-                    strcpy(yylval.var, yytext);
+                    //yylval.var = (char*) malloc(sizeof(char)*strlen(yytext)+1);
+                    //strcpy(yylval.var, yytext);
+                    yylval.var = (char*) malloc(sizeof(char)+2);
+                    strcpy(yylval.var, "0");
                     return MZN_BOOL_LITERAL; 
                   }
 [0-9]+            { 

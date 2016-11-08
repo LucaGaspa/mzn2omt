@@ -136,7 +136,7 @@
 %type <expr> expr_atom_head set_expr expr expr_list expr_list_head set_literal
 %type <expr> comp_tail generator_list generator_list_head generator id_list id_list_head
 %type <expr> set_comp simple_array_literal simple_array_literal_2d simple_array_literal_2d_list
-%type <expr> simple_array_comp array_access_tail call_expr comp_or_expr
+%type <expr> simple_array_comp array_access_tail call_expr comp_or_expr if_then_else_expr
 %type <symbol> base_ti_expr_tail base_ti_expr ti_expr ti_expr_and_id
 %type <symbolList> ti_expr_list ti_expr_list_head
 
@@ -748,7 +748,9 @@ expr_atom_head :
     | simple_array_comp array_access_tail
       { /* TODO:: */ }
     | if_then_else_expr
-      { /* TODO:: */ }
+      {
+        $$ = $1;
+      }
     | if_then_else_expr array_access_tail
       { /* NOT SUPPORTED */ }
     | let_expr
@@ -907,12 +909,17 @@ simple_array_comp :
 
 if_then_else_expr :
       MZN_IF expr MZN_THEN expr elseif_list MZN_ELSE expr MZN_ENDIF
-      { /* TODO:: */ }
+      {
+        $$ = new Expr(MZN_IF,3,$2,$4,$7);
+      }
 
 elseif_list :
-      { /* NOT SUPPORTED */ }
+      { }
     | elseif_list MZN_ELSEIF expr MZN_THEN expr
-      { /* NOT SUPPORTED */ }
+      {
+        std::cerr << "parser: NOT SUPPORTED elseif\n";
+        exit(0);
+      }
 
 quoted_op :
       MZN_EQUIV_QUOTED

@@ -213,6 +213,27 @@ void Expr::interpret(){
             op->at(0)->interpret();
             std::cout << ")";
             break;
+        case MZN_IF:
+            Literal* cond = (Literal*) op->at(0)->eval();
+            if(cond->getDomain() != ID){
+                //just print right branch
+                if(cond->getValue()){
+                    op->at(1)->interpret();
+                }else{
+                    op->at(2)->interpret();
+                }
+            }else{
+                std::cout << "(and (=> ";
+                op->at(0)->interpret();
+                std::cout << " ";
+                op->at(1)->interpret();
+                std::cout << ") (=> (not ";
+                op->at(0)->interpret();
+                std::cout << ") ";
+                op->at(2)->interpret();
+                std::cout << "))";
+            }
+            break;
     }
     return;
 }
@@ -222,6 +243,10 @@ Expr_node* Expr::eval(){
     Expr_node* op1 = op->at(0)->eval();
     Expr_node* op2 = op->at(1)->eval();
     Expr_node* res;
+    if( ((Literal*) op1)->getDomain() == ID || ((Literal*) op1)->getDomain() == ID ){
+        res = new Literal(ID,"Bad Eval");
+        return res;
+    }
     switch(oper){
         case MZN_EQUIV:
             

@@ -80,14 +80,26 @@ void Literal::interpret(){
 					std::cout << name;	
 				}
 			}else{
-				Literal* tmp = (Literal*)((Literal*) sym->getValue())->eval();
-				std::cout << tmp->toString();
+				if(sym->hasValue()){
+					Literal* tmp = (Literal*)((Literal*) sym->getValue())->eval();
+					std::cout << tmp->toString();	
+				}else{
+					std::cout << name;
+				}	
 			}
 		}else{
 			std::cout << name;
 		}
 	}else{
-		std::cout << value.to_str();
+		if(domain == BOOL){
+			if(value){
+				std::cout << "True";
+			}else{
+				std::cout << "False";
+			}
+		}else{
+			std::cout << value.to_str();
+		}
 	}
 }
 
@@ -96,10 +108,16 @@ Expr_node* Literal::eval(){
 	if(domain == ID){
 		Symbol* tmp = SymbolTable::getInstance().get(this->id);
 		if(tmp != NULL){
-			return tmp->getValue()->eval();
+			if(tmp->hasValue()){	
+				return tmp->getValue()->eval();
+			}else{
+				return this;
+			}
 		}else{
-			std::cerr << "id: " << this->id << std::endl;
-			std::cerr << "LITERAL EVAL ERROR -- literal.cpp" << std::endl;
+			//not really an error -> if needs to try an evaluation to choose encoding
+			//std::cerr << "id: " << this->id << std::endl;
+			//std::cerr << "LITERAL EVAL ERROR -- literal.cpp" << std::endl;
+			return this;
 		}
 	}
 	return this;
