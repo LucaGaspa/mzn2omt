@@ -23,7 +23,9 @@ Expr::Expr(int oper, int nops, ...){
     va_end(ap);
 }
 
+//interpret -> prints the parsed tree
 void Expr::interpret(){
+    Literal* cond = NULL;
     //fat switch
     switch(oper){
         case MZN_EQUIV:
@@ -214,7 +216,7 @@ void Expr::interpret(){
             std::cout << ")";
             break;
         case MZN_IF:
-            Literal* cond = (Literal*) op->at(0)->eval();
+            cond = (Literal*) op->at(0)->eval();
             if(cond->getDomain() != ID){
                 //just print right branch
                 if(cond->getValue()){
@@ -234,11 +236,14 @@ void Expr::interpret(){
                 std::cout << "))";
             }
             break;
+        default:
+            std::cerr << "Not supported expr encoding: expr.cpp 12 :: default" << std::endl;
+            break;
     }
     return;
 }
 
-//eval -> elaborate values and return their strval
+//eval -> tries to calculate the value of the parsed tree
 Expr_node* Expr::eval(){
     Expr_node* op1 = op->at(0)->eval();
     Expr_node* op2 = op->at(1)->eval();
@@ -340,10 +345,10 @@ Expr_node* Expr::eval(){
             res = &(*((Literal*)op1) / *((Literal*)op2));
             break;
         case MZN_IDIV:
-            //res = &(*op1 / *op2);
+            //res = &(*((Literal*)op1) / *((Literal*)op2));
             break;
         case MZN_MOD:
-            //res = &(*op1 % *op2);
+            //res = &(*((Literal*)op1) % *((Literal*)op2));
             break;
 
         case MZN_QUOTED_IDENTIFIER:

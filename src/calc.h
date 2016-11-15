@@ -227,6 +227,7 @@ public:
 	inline void setTi_type(TI_TYPE t){ti_type = t;};
 	inline void setSymbolType(ATOM_TYPE tp){type = tp;};
 	inline void setIdentifier(char* ident){id = new std::string(ident);};
+	void setID(string new_id);
 	void setValue(Expr_node* expr);
 
 	inline DOMAIN_TYPE getDomain(){return domain;};

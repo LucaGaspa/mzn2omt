@@ -136,9 +136,9 @@
 %type <expr> expr_atom_head set_expr expr expr_list expr_list_head set_literal
 %type <expr> comp_tail generator_list generator_list_head generator id_list id_list_head
 %type <expr> set_comp simple_array_literal simple_array_literal_2d simple_array_literal_2d_list
-%type <expr> simple_array_comp array_access_tail call_expr comp_or_expr if_then_else_expr
-%type <symbol> base_ti_expr_tail base_ti_expr ti_expr ti_expr_and_id
-%type <symbolList> ti_expr_list ti_expr_list_head
+%type <expr> simple_array_comp array_access_tail call_expr comp_or_expr if_then_else_expr let_expr
+%type <symbol> base_ti_expr_tail base_ti_expr ti_expr ti_expr_and_id let_vardecl_item
+%type <symbolList> ti_expr_list ti_expr_list_head let_vardecl_item_list
 
 %%
 
@@ -207,7 +207,7 @@ vardecl_item :
               SymbolTable::getInstance().globalInsert($1,$4);
               $1->printDecl();
               if($1->getTi_type() == VAR || $1->getTi_type() == SETVAR){
-                Expr_node* c = new Expr(MZN_EQUIV, 2, new Literal($1->getDomain(), $1->getID()), $4);
+                Expr_node* c = new Expr(MZN_EQUIV, 2, new Literal(ID, $1->getID()), $4);
                 std::cout << "(assert ";
                 c->interpret();
                 std::cout << ")" << std::endl;
@@ -754,7 +754,10 @@ expr_atom_head :
     | if_then_else_expr array_access_tail
       { /* NOT SUPPORTED */ }
     | let_expr
-      { /* TODO:: */ }
+      {
+        /* nothing to do */
+        $$ = NULL;
+      }
     | call_expr
       {
         $$ = $1;
@@ -1012,27 +1015,82 @@ comp_or_expr :
 
 let_expr :
       MZN_LET '{' let_vardecl_item_list '}' MZN_IN expr %prec PREC_ANNO
-      { /* TODO:: */ }
+      {
+        //same code... preferred to create a let_manage() in SymbolTable
+        std::queue<Symbol*>* q = $3;
+        SymbolTable* s = & SymbolTable::getInstance();
+        s->newLocalTable();
+        
+        Symbol* tmp;
+        while(!q->empty()){
+          tmp = q->front();
+          q->pop();
+
+          s->localInsert(tmp->getID(), tmp);
+        }
+
+        $6->interpret();
+        s->deleteLocalTable();
+      }
     | MZN_LET '{' let_vardecl_item_list comma_or_semi '}' MZN_IN expr %prec PREC_ANNO
-      { /* TODO:: */ }
+      {
+        std::queue<Symbol*>* q = $3;
+        SymbolTable* s = & SymbolTable::getInstance();
+        s->newLocalTable();
+        
+        Symbol* tmp;
+        while(!q->empty()){
+          tmp = q->front();
+          q->pop();
+
+          s->localInsert(tmp->getID(), tmp);
+        }
+
+        $7->interpret();
+        s->deleteLocalTable(); 
+      }
 
 let_vardecl_item_list :
       let_vardecl_item
-      { /* TODO:: */ }
+      {
+        $$ = new std::queue<Symbol*>();
+        $$->push($1);
+      }
     | constraint_item
-      { /* TODO:: */ }
+      { /* NOT SUPPORTED */ }
     | let_vardecl_item_list comma_or_semi let_vardecl_item
-      { /* TODO:: */ }
+      {
+        $$ = $1;
+        $$->push($3);
+      }
     | let_vardecl_item_list comma_or_semi constraint_item
-      { /* TODO:: */ }
+      { /* NOT SUPPORTED */ }
 
 comma_or_semi : ',' | ';'
 
 let_vardecl_item :
       ti_expr_and_id annotations
-      { /* TODO:: */ }
+      {
+        
+        Symbol* mySym = $1;
+        string old_name = mySym->getID();
+        Literal* wrap_value = new Literal(ID, old_name+"@_wrap_@");
+        mySym->setID(wrap_value->toString());
+        mySym->printDecl();
+        mySym->setID(old_name);
+        mySym->setValue(wrap_value);
+        
+        $$ = mySym;
+        //FRESH VARS -> declare with new name -> assign new name as val :D (became a wrapper)
+      }
     | ti_expr_and_id annotations MZN_EQ expr
-      { /* TODO:: */ }
+      {
+        Symbol* mySym = $1;
+        mySym->setValue($4);
+
+        $$ = mySym;
+        //VARS assigned with old values -> no need to declare, just a wrapper
+      }
 
 annotations :
       /* empty */

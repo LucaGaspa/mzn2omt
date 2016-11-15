@@ -53,6 +53,13 @@ void Symbol::setRange(DOMAIN_TYPE d, IntervalSet* set){
     this->range = set;
 }
 
+void Symbol::setID(string new_id){
+    if(id){
+        delete id;
+    }
+    id = new std::string(new_id);
+}
+
 void Symbol::setValue(Expr_node* expr){
     if(dynamic_cast<ExprList*>(expr)){
         value = (ExprList*)expr;
@@ -71,7 +78,7 @@ Expr_node* Symbol::getValue(){
 }
 
 bool Symbol::hasValue(){
-    if(value){
+    if(value != NULL){
         return true;
     }else{
         return false;
@@ -349,6 +356,7 @@ void SymbolTable::globalInsert(Symbol* symbol, Expr_node* expr){
 }
 
 void SymbolTable::deleteLocalTable(){
+    //memory leak
     localTable->pop_back();
 }
 

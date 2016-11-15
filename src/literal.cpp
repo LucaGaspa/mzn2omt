@@ -16,7 +16,7 @@ Literal::Literal(DOMAIN_TYPE d, const char* lit){
 	domain = d;
 	if(domain == ID){
 		id = string(lit);
-		value = DNumber("0");
+		value = DNumber(DNumber::plus_inf);
 	}else{
 		id = "NULL";
 		string tmp = lit;
@@ -29,7 +29,7 @@ Literal::Literal(DOMAIN_TYPE d, string lit){
 	domain = d;
 	if(domain == ID){
 		id = lit;
-		value = DNumber("0");
+		value = DNumber(DNumber::plus_inf);
 	}else{
 		id = "NULL";
 		value = DNumber(lit);
