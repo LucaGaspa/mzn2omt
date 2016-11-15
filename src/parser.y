@@ -456,7 +456,7 @@ set_expr :
         //SET EXPR -> needs Literals to construct an interval, so eval before pass up
         Expr_node* tmp = $1;
         if(dynamic_cast<Literal*>(tmp)){
-            Symbol* s = SymbolTable::getInstance().get(((Literal*)tmp)->toString());    
+            Symbol* s = SymbolTable::getInstance().get(((Literal*)tmp)->getID());    
             if(s == NULL){
               $$ = tmp;
             }else{
@@ -1036,20 +1036,6 @@ let_expr :
     | MZN_LET '{' let_vardecl_item_list comma_or_semi '}' MZN_IN expr %prec PREC_ANNO
       {
         $$ = new Let($3,$7);
-        // std::queue<Symbol*>* q = $3;
-        // SymbolTable* s = & SymbolTable::getInstance();
-        // s->newLocalTable();
-        
-        // Symbol* tmp;
-        // while(!q->empty()){
-        //   tmp = q->front();
-        //   q->pop();
-
-        //   s->localInsert(tmp->getID(), tmp);
-        // }
-
-        // $7->interpret();
-        // s->deleteLocalTable(); 
       }
 
 let_vardecl_item_list :

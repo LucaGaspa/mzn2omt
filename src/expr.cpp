@@ -432,7 +432,7 @@ void Comp::deleteDecompression(){
 void Comp::initDecompression(){
     SymbolTable::getInstance().newLocalTable();
     for (vector<pair<Literal*,Set*>*>::iterator it = ids->begin(); it != ids->end(); it++){
-        SymbolTable::getInstance().localInsert((*it)->first->toString(), new Symbol((*it)->first));
+        SymbolTable::getInstance().localInsert((*it)->first->getID(), new Symbol((*it)->first));
     }
 }
 
@@ -450,7 +450,7 @@ void Comp::decompress(int index){
         for (IntervalSet::value_iterator it = range->value_begin(),
                         end = range->value_end(); it != end; ++it) {
             SymbolTable::getInstance().localInsert((
-                        this->ids->at(index))->first->toString(),
+                        this->ids->at(index))->first->getID(),
                         new Symbol(
                             new Literal(
                                         ((this->ids->at(index))->second)->getDomain(),
@@ -553,7 +553,7 @@ void Let::interpret(){
             Symbol* mySym = tmp;
             string old_name = mySym->getID();
             Literal* wrap_value = new Literal(ID, old_name+"@_wrap_@");
-            mySym->setID(wrap_value->toString());
+            mySym->setID(wrap_value->getID());
             mySym->printDecl();
             mySym->setID(old_name);
             mySym->setValue(wrap_value);

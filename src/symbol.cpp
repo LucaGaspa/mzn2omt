@@ -29,7 +29,7 @@ Symbol::Symbol(Literal* lit){
     type = LIT;
     domain = lit->getDomain();
     if(domain == ID){
-        id = new string(lit->toString());    
+        id = new string(lit->getID());    
     }else{
         setValue(lit);
     }
@@ -233,7 +233,7 @@ void init_forall(std::vector<pair<Literal*,Set*>*>* ids){
         return;
     }
     for (vector<pair<Literal*,Set*>*>::iterator it = ids->begin(); it != ids->end(); it++){
-        SymbolTable::getInstance().localInsert((*it)->first->toString(), new Symbol((*it)->first));
+        SymbolTable::getInstance().localInsert((*it)->first->getID(), new Symbol((*it)->first));
     }
 }
 
@@ -253,7 +253,7 @@ void cycle_forall(int index, std::vector<pair<Literal*,Set*>*>* ids, Expr_node* 
         for (IntervalSet::value_iterator it = range->value_begin(),
                         end = range->value_end(); it != end; ++it) {
             SymbolTable::getInstance().localInsert((
-                        ids->at(index))->first->toString(),
+                        ids->at(index))->first->getID(),
                         new Symbol(
                             new Literal(
                                         ((ids->at(index))->second)->getDomain(),
@@ -295,7 +295,12 @@ void count_interpret(Fun* f){
     string id = f->getID();
     ExprList* args = f->getArgs();
 
-    Symbol* ident = SymbolTable::getInstance().get(((Literal*) args->at(0))->toString());
+    Symbol* ident = SymbolTable::getInstance().get(((Literal*) args->at(0))->getID());
+    if(!ident){
+        std::cerr << "\ncount_interpret: array not found" << std::endl;
+        std::cerr << ((Literal*) args->at(0))->getID() << std::endl;
+        exit(0);
+    }
     string id_sum = "pbsum_" + ident->getID();
     
     if(! ident){
@@ -304,7 +309,7 @@ void count_interpret(Fun* f){
     if(ident->getIndexSize() != 1){
         std::cerr << "Count Error:: Wrong array indexes" << std::endl;
     }else{
-        std::cout << "\r"; //delete "(assert " string coming from parser default
+        std::cout << "\r\n"; //delete "(assert " string coming from parser default
         IntervalSet* index = ident->getIndexes()->at(0);
         for (IntervalSet::value_iterator it = index->value_begin(),
                         end = index->value_end(); it != end; ++it) {

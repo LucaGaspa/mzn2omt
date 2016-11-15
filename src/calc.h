@@ -107,6 +107,7 @@ public:
 	void interpret();
 	Expr_node* eval();
 
+	inline string getID(){return id;};
 	string toString() const;
 	DOMAIN_TYPE getDomain() const;
 	DNumber getValue() const;
