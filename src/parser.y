@@ -216,7 +216,16 @@ vardecl_item :
  
 assign_item :
       MZN_IDENTIFIER MZN_EQ expr
-             { } 
+             {
+                string id = string($1);
+                Symbol* MySym = SymbolTable::getInstance().get(id);
+                if(MySym){
+                  MySym->setValue($3);
+                }else{
+                  std::cerr << "Assignment to a NOT DECLARED VAR: " << id << endl;
+                  exit(0);
+                }
+             } 
  
 constraint_item :
       MZN_CONSTRAINT expr
@@ -443,13 +452,19 @@ expr_list_head :
 set_expr :
       expr_atom_head
       {
+        //$$ = $1;
+        //SET EXPR -> needs Literals to construct an interval, so eval before pass up
         Expr_node* tmp = $1;
         if(dynamic_cast<Literal*>(tmp)){
             Symbol* s = SymbolTable::getInstance().get(((Literal*)tmp)->toString());    
             if(s == NULL){
               $$ = tmp;
             }else{
-              $$ = s->getValue()->eval();
+              if(s->hasValue()){
+                $$ = s->getValue()->eval();
+              }else{
+                $$ = tmp;
+              }
             }
         }else{
             $$ = tmp;

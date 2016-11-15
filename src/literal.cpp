@@ -73,7 +73,6 @@ void Literal::interpret(){
 					}else{
 						int i_int = atoi(i.to_str().c_str());
 						int j_int = atoi(j.to_str().c_str());
-
 						sym->getValue_at(i_int,j_int)->interpret();
 					}
 				}else{
@@ -104,21 +103,53 @@ void Literal::interpret(){
 }
 
 Expr_node* Literal::eval(){
-	//TODO:: if(index != NULL) --> return SymbolTable::getInstance().get(printName(id));
+	
+	string name = this->id;
+	DNumber i = DNumber(0);
+	DNumber j = DNumber(0);
+	DNumber k = DNumber(0);
+	
+	if(index){
+		switch(index->size()){
+			case 3:
+				k = ((Literal*) index->at(2)->eval())->getValue();
+			case 2:
+				j = ((Literal*) index->at(1)->eval())->getValue(); 
+			case 1:
+				i = ((Literal*) index->at(0)->eval())->getValue();
+		}
+		name = SymbolTable::getInstance().printName(name, i, j, k);
+	}
+
 	if(domain == ID){
-		Symbol* tmp = SymbolTable::getInstance().get(this->id);
-		if(tmp != NULL){
-			if(tmp->hasValue()){	
-				return tmp->getValue()->eval();
+		Symbol* sym = SymbolTable::getInstance().get(this->id);
+		if(sym){
+			if(index){
+				if(sym->hasValue()){
+					if(index->size() == 1){
+						int i_int = atoi(i.to_str().c_str());
+						return sym->getValue_at(i_int);
+					}else{
+						int i_int = atoi(i.to_str().c_str());
+						int j_int = atoi(j.to_str().c_str());
+						return sym->getValue_at(i_int, j_int);
+					}
+				}else{
+					return this;
+				}
 			}else{
-				return this;
+				if(sym->hasValue()){
+					Literal* tmp = (Literal*)((Literal*) sym->getValue())->eval();
+					return tmp;
+				}else{
+					return this;
+				}	
 			}
 		}else{
-			//not really an error -> if needs to try an evaluation to choose encoding
-			//std::cerr << "id: " << this->id << std::endl;
-			//std::cerr << "LITERAL EVAL ERROR -- literal.cpp" << std::endl;
 			return this;
 		}
+	}else{
+		return this;
 	}
 	return this;
 }
@@ -135,7 +166,10 @@ void Literal::addIndex(Expr_node* exp){
 	if(!index){
 		index = (ExprList*) exp;
 	}else{
-		index->add(exp);
+		for (int i = 0; i < ((ExprList*) exp)->size(); ++i)
+		{
+			index->add( ((ExprList*) exp)->at(i) );
+		}
 	}
 }
 
@@ -146,19 +180,16 @@ string Literal::toString() const{
 			DNumber i = DNumber(0);
 			DNumber j = DNumber(0);
 			DNumber k = DNumber(0);
-			//std::vector<Expr_node*>* v;
-
-			if(index){
-				switch(index->size()){
-					case 3:
-						k = ((Literal*) index->at(2)->eval())->getValue();
-					case 2:
-						j = ((Literal*) index->at(1)->eval())->getValue(); 
-					case 1:
-						i = ((Literal*) index->at(0)->eval())->getValue();
-				}
-				name = SymbolTable::getInstance().printName(id, i, j, k);
+	
+			switch(index->size()){
+				case 3:
+					k = ((Literal*) index->at(2)->eval())->getValue();
+				case 2:
+					j = ((Literal*) index->at(1)->eval())->getValue(); 
+				case 1:
+					i = ((Literal*) index->at(0)->eval())->getValue();
 			}
+			name = SymbolTable::getInstance().printName(id, i, j, k);
 			return name;
 		}else{
 			return id;

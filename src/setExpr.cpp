@@ -44,6 +44,7 @@ Set::Set(int oper, Expr_node* a, Expr_node* b){
 	}
 	switch(oper){
 		case MZN_DOTDOT:
+			//cout << ((Literal*) lb)->toString() << " - " << ((Literal*) ub)->toString() << endl;
 		    s = Interval(((Literal*) lb)->getValue(), ((Literal*) ub)->getValue());
 			set = new IntervalSet(s);
 			break;
