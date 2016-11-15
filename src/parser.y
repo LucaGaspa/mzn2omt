@@ -755,8 +755,7 @@ expr_atom_head :
       { /* NOT SUPPORTED */ }
     | let_expr
       {
-        /* nothing to do */
-        $$ = NULL;
+        $$ = $1;
       }
     | call_expr
       {
@@ -1017,37 +1016,25 @@ let_expr :
       MZN_LET '{' let_vardecl_item_list '}' MZN_IN expr %prec PREC_ANNO
       {
         //same code... preferred to create a let_manage() in SymbolTable
-        std::queue<Symbol*>* q = $3;
-        SymbolTable* s = & SymbolTable::getInstance();
-        s->newLocalTable();
-        
-        Symbol* tmp;
-        while(!q->empty()){
-          tmp = q->front();
-          q->pop();
-
-          s->localInsert(tmp->getID(), tmp);
-        }
-
-        $6->interpret();
-        s->deleteLocalTable();
+        $$ = new Let($3, $6);
       }
     | MZN_LET '{' let_vardecl_item_list comma_or_semi '}' MZN_IN expr %prec PREC_ANNO
       {
-        std::queue<Symbol*>* q = $3;
-        SymbolTable* s = & SymbolTable::getInstance();
-        s->newLocalTable();
+        $$ = new Let($3,$7);
+        // std::queue<Symbol*>* q = $3;
+        // SymbolTable* s = & SymbolTable::getInstance();
+        // s->newLocalTable();
         
-        Symbol* tmp;
-        while(!q->empty()){
-          tmp = q->front();
-          q->pop();
+        // Symbol* tmp;
+        // while(!q->empty()){
+        //   tmp = q->front();
+        //   q->pop();
 
-          s->localInsert(tmp->getID(), tmp);
-        }
+        //   s->localInsert(tmp->getID(), tmp);
+        // }
 
-        $7->interpret();
-        s->deleteLocalTable(); 
+        // $7->interpret();
+        // s->deleteLocalTable(); 
       }
 
 let_vardecl_item_list :
@@ -1072,23 +1059,26 @@ let_vardecl_item :
       ti_expr_and_id annotations
       {
         
-        Symbol* mySym = $1;
-        string old_name = mySym->getID();
-        Literal* wrap_value = new Literal(ID, old_name+"@_wrap_@");
-        mySym->setID(wrap_value->toString());
-        mySym->printDecl();
-        mySym->setID(old_name);
-        mySym->setValue(wrap_value);
+        $$ = $1;
+        // Symbol* mySym = $1;
+        // string old_name = mySym->getID();
+        // Literal* wrap_value = new Literal(ID, old_name+"@_wrap_@");
+        // mySym->setID(wrap_value->toString());
+        // mySym->printDecl();
+        // mySym->setID(old_name);
+        // mySym->setValue(wrap_value);
         
-        $$ = mySym;
+        // $$ = mySym;
         //FRESH VARS -> declare with new name -> assign new name as val :D (became a wrapper)
       }
     | ti_expr_and_id annotations MZN_EQ expr
       {
-        Symbol* mySym = $1;
-        mySym->setValue($4);
+        $$ = $1;
+        $$->setValue($4);
+        // Symbol* mySym = $1;
+        // mySym->setValue($4);
 
-        $$ = mySym;
+        // $$ = mySym;
         //VARS assigned with old values -> no need to declare, just a wrapper
       }
 

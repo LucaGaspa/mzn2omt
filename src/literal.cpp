@@ -77,7 +77,7 @@ void Literal::interpret(){
 						sym->getValue_at(i_int,j_int)->interpret();
 					}
 				}else{
-					std::cout << name;	
+					std::cout << name;
 				}
 			}else{
 				if(sym->hasValue()){
@@ -141,7 +141,28 @@ void Literal::addIndex(Expr_node* exp){
 
 string Literal::toString() const{
 	if(domain == ID){
-		return id;
+		if(index){
+			string name;
+			DNumber i = DNumber(0);
+			DNumber j = DNumber(0);
+			DNumber k = DNumber(0);
+			//std::vector<Expr_node*>* v;
+
+			if(index){
+				switch(index->size()){
+					case 3:
+						k = ((Literal*) index->at(2)->eval())->getValue();
+					case 2:
+						j = ((Literal*) index->at(1)->eval())->getValue(); 
+					case 1:
+						i = ((Literal*) index->at(0)->eval())->getValue();
+				}
+				name = SymbolTable::getInstance().printName(id, i, j, k);
+			}
+			return name;
+		}else{
+			return id;
+		}
 	}else{
 		return value.to_str();
 	}

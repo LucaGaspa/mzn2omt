@@ -37,6 +37,7 @@ enum EXPR_DOMAIN{INTINT,FLOATINT,INTFLOAT,FLOATFLOAT,BOOLBOOL};
 
 class Literal;
 class ExprList;
+class Symbol;
 
 class Expr_node {
 	//Container for various items. Never istantiated (Pure virtual class).
@@ -180,10 +181,11 @@ public:
 
 class Let: public Expr_node {
 	//Let represents let_expr non-terminal
-	//Hashtable* letMap;			//SymbolTable* let_map
+	std::queue<Symbol*>* local_ids;
 	Expr_node* body;			//body of the let
 
 public:
+	Let(std::queue<Symbol*>* q, Expr_node* b);
 	void interpret();
 	Expr_node* eval();
 };

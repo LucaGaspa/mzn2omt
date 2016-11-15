@@ -529,3 +529,39 @@ void Fun::interpret(){
     }
 }
 Expr_node* Fun::eval(){}
+
+/* LET EXPR */
+
+Let::Let(std::queue<Symbol*>* q, Expr_node* b){
+    local_ids = q;
+    body = b;
+}
+
+Expr_node* Let::eval(){}
+
+void Let::interpret(){
+    SymbolTable* s = & SymbolTable::getInstance();
+    s->newLocalTable();
+
+    Symbol* tmp;
+    while(!local_ids->empty()){
+        tmp = local_ids->front();
+        local_ids->pop();
+
+        if(! tmp->hasValue()){
+            //FRESH VARS -> declare with new name -> assign new name as val :D (became a wrapper)
+            Symbol* mySym = tmp;
+            string old_name = mySym->getID();
+            Literal* wrap_value = new Literal(ID, old_name+"@_wrap_@");
+            mySym->setID(wrap_value->toString());
+            mySym->printDecl();
+            mySym->setID(old_name);
+            mySym->setValue(wrap_value);
+        } //else :: VARS assigned with old values -> no need to declare, just a wrapper
+
+        s->localInsert(tmp->getID(), tmp);
+    }
+    
+    body->interpret();
+    s->deleteLocalTable();
+}
