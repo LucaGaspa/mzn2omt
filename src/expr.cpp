@@ -543,10 +543,12 @@ void Let::interpret(){
     SymbolTable* s = & SymbolTable::getInstance();
     s->newLocalTable();
 
+    std::queue<Symbol*>* ids_buffer = new std::queue<Symbol*>();
     Symbol* tmp;
     while(!local_ids->empty()){
         tmp = local_ids->front();
         local_ids->pop();
+        ids_buffer->push(tmp);
 
         if(! tmp->hasValue()){
             //FRESH VARS -> declare with new name -> assign new name as val :D (became a wrapper)
@@ -563,5 +565,8 @@ void Let::interpret(){
     }
     
     body->interpret();
+    delete local_ids;
+    //saving the queue again in the obj for future iterations
+    local_ids = ids_buffer;
     s->deleteLocalTable();
 }

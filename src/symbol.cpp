@@ -309,21 +309,22 @@ void count_interpret(Fun* f){
     if(ident->getIndexSize() != 1){
         std::cerr << "Count Error:: Wrong array indexes" << std::endl;
     }else{
-        std::cout << "\r\n"; //delete "(assert " string coming from parser default
-        IntervalSet* index = ident->getIndexes()->at(0);
-        for (IntervalSet::value_iterator it = index->value_begin(),
-                        end = index->value_end(); it != end; ++it) {
-            std::cout << "(assert-soft (not (= ";
-                      f->getArgs()->at(1)->interpret();
-            std::cout << " "
-                      <<  SymbolTable::getInstance().printName(ident->getID(), *it, 0,0)
-                      << ")) :id "
-                      << id_sum << ")\n";
-        }
+        // -----> assert-soft part: how to append at start of the line of stdout?
+        // std::cout << "\r"; //delete "(assert " string coming from parser default
+        // IntervalSet* index = ident->getIndexes()->at(0);
+        // for (IntervalSet::value_iterator it = index->value_begin(),
+        //                 end = index->value_end(); it != end; ++it) {
+        //     std::cout << "(assert-soft (not (= ";
+        //               f->getArgs()->at(1)->interpret();
+        //     std::cout << " "
+        //               <<  SymbolTable::getInstance().printName(ident->getID(), *it, 0,0)
+        //               << ")) :id "
+        //               << id_sum << ")\n";
+        // }
     }
 
-    std::cout << "(assert "
-              << "(= " << id_sum << " ";
+    //std::cout << "(assert "
+    std::cout << "(= " << id_sum << " ";
     f->getArgs()->at(2)->interpret();
     std::cout << ")";
 }
