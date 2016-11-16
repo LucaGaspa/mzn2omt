@@ -528,7 +528,9 @@ void Fun::interpret(){
         f(this);
     }
 }
-Expr_node* Fun::eval(){}
+Expr_node* Fun::eval(){
+    return NULL;
+}
 
 /* LET EXPR */
 

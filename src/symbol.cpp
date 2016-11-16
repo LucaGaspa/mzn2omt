@@ -285,6 +285,8 @@ void forall_interpret(Fun* f){
         std::cout << "(+ ";
     }else if(id.compare("exist") == 0){
         std::cout << "(or ";
+    }else{
+        std::cerr << "NOT SUPPORTED FUNCTION: " << id << std::endl;
     }
     cycle_forall(0,ids,body,condition);
     std::cout << ")";
@@ -329,6 +331,114 @@ void count_interpret(Fun* f){
     std::cout << ")";
 }
 
+void max_min_func(Fun* f){
+    string id = f->getID();
+    ExprList* args = f->getArgs();
+
+    Literal* max_min_val = NULL;
+    if(id.compare("max") == 0){
+        //case x - y => VAR or PAR (ret max(x,y))
+        //case array_x => VAR or PAR (ret max element)
+        //case set_x => PAR
+        
+        if(args->size() == 1){
+            Symbol* tmp = SymbolTable::getInstance().get( ((Literal*) args->at(0))->getID() );
+            if(tmp){
+                if(tmp->hasValue()){
+                    Expr_node* array_or_set = tmp->getValue();
+                    if(dynamic_cast<Set*>( ((ExprList*) array_or_set)->at(0) )){
+                        array_or_set = ((ExprList*) array_or_set)->at(0);
+                        max_min_val = new Literal(INT, ((Set*) array_or_set)->getSet()->upper() );
+                    }else{
+                        max_min_val = (Literal*) ((ExprList*) array_or_set)->at(0);
+                        for (int i = 1 ; i < ((ExprList*) array_or_set)->size(); ++i){
+                            if( ((ExprList*) array_or_set)->at(i) > max_min_val ){
+                                max_min_val = (Literal*) ((ExprList*) array_or_set)->at(i);
+                            }
+                        }
+                    }
+                }else{
+                    std::cerr << "Not Evaluable argument of Max" << std::endl;
+                    exit(0);
+                }
+            }else{
+                std::cerr << "Not Evaluable argument of Max" << std::endl;
+                exit(0);
+            }
+        }else if (args->size() == 2){
+            Symbol* op1 = SymbolTable::getInstance().get( ((Literal*) args->at(0))->getID() );
+            Symbol* op2 = SymbolTable::getInstance().get( ((Literal*) args->at(1))->getID() );
+            if(op1 && op2){
+                Literal* lit1 = (Literal*) ((ExprList*) op1->getValue())->eval();
+                Literal* lit2 = (Literal*) ((ExprList*) op2->getValue())->eval();
+                if( lit1 > lit2 ){
+                    max_min_val = lit1;
+                }else{
+                    max_min_val = lit2;
+                }
+            }else{
+                std::cerr << "Not Evaluable argument of Max" << std::endl;
+                exit(0);
+            }
+            //return max(args->at(0),args->at(1))
+        }else{
+            std::cerr << "Max wrong number of args" << std::endl;
+            exit(0);
+        }
+    }else{
+        if(args->size() == 1){
+            Symbol* tmp = SymbolTable::getInstance().get( ((Literal*) args->at(0))->getID() );
+            if(tmp){
+                if(tmp->hasValue()){
+                    Expr_node* array_or_set = tmp->getValue();
+                    if(dynamic_cast<Set*>( ((ExprList*) array_or_set)->at(0) )){
+                        array_or_set = ((ExprList*) array_or_set)->at(0);
+                        max_min_val = new Literal(INT, ((Set*) array_or_set)->getSet()->lower() );
+                    }else{
+                        max_min_val = (Literal*) ((ExprList*) array_or_set)->at(0);
+                        for (int i = 1 ; i < ((ExprList*) array_or_set)->size(); ++i){
+                            if( ((ExprList*) array_or_set)->at(i) < max_min_val ){
+                                max_min_val = (Literal*) ((ExprList*) array_or_set)->at(i);
+                            }
+                        }
+                    }
+                }else{
+                    std::cerr << "Not Evaluable argument of Min" << std::endl;
+                    exit(0);
+                }
+            }else{
+                std::cerr << "Not Evaluable argument of Min" << std::endl;
+                exit(0);
+            }
+        }else if (args->size() == 2){
+            Symbol* op1 = SymbolTable::getInstance().get( ((Literal*) args->at(0))->getID() );
+            Symbol* op2 = SymbolTable::getInstance().get( ((Literal*) args->at(1))->getID() );
+            if(op1 && op2){
+                Literal* lit1 = (Literal*) ((ExprList*) op1->getValue())->eval();
+                Literal* lit2 = (Literal*) ((ExprList*) op2->getValue())->eval();
+                if( lit1 < lit2 ){
+                    max_min_val = lit1;
+                }else{
+                    max_min_val = lit2;
+                }
+            }else{
+                std::cerr << "Not Evaluable argument of Min" << std::endl;
+                exit(0);
+            }
+            //return max(args->at(0),args->at(1))
+        }else{
+            std::cerr << "Min wrong number of args" << std::endl;
+            exit(0);
+        }
+    }
+    if(max_min_val){
+        max_min_val->interpret();
+    }else{
+        std::cerr << "Not Evaluable argument of Max or Min" << std::endl;
+        exit(0);
+    }
+}
+
 //===================================================================//
 //SymbolTable
 //===================================================================//
@@ -342,6 +452,8 @@ SymbolTable::SymbolTable(){
     libr_func.push_back(std::pair<std::string, fptr>("sum", forall_interpret));
     libr_func.push_back(std::pair<std::string, fptr>("exist", forall_interpret));
     libr_func.push_back(std::pair<std::string, fptr>("count", count_interpret));
+    libr_func.push_back(std::pair<std::string, fptr>("max", max_min_func));
+    libr_func.push_back(std::pair<std::string, fptr>("min", max_min_func));
 }
 
 void SymbolTable::setValue(Symbol* symbol, Expr_node* expr){

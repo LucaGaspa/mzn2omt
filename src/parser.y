@@ -1030,7 +1030,6 @@ comp_or_expr :
 let_expr :
       MZN_LET '{' let_vardecl_item_list '}' MZN_IN expr %prec PREC_ANNO
       {
-        //same code... preferred to create a let_manage() in SymbolTable
         $$ = new Let($3, $6);
       }
     | MZN_LET '{' let_vardecl_item_list comma_or_semi '}' MZN_IN expr %prec PREC_ANNO
@@ -1059,28 +1058,12 @@ comma_or_semi : ',' | ';'
 let_vardecl_item :
       ti_expr_and_id annotations
       {
-        
         $$ = $1;
-        // Symbol* mySym = $1;
-        // string old_name = mySym->getID();
-        // Literal* wrap_value = new Literal(ID, old_name+"@_wrap_@");
-        // mySym->setID(wrap_value->toString());
-        // mySym->printDecl();
-        // mySym->setID(old_name);
-        // mySym->setValue(wrap_value);
-        
-        // $$ = mySym;
-        //FRESH VARS -> declare with new name -> assign new name as val :D (became a wrapper)
       }
     | ti_expr_and_id annotations MZN_EQ expr
       {
         $$ = $1;
         $$->setValue($4);
-        // Symbol* mySym = $1;
-        // mySym->setValue($4);
-
-        // $$ = mySym;
-        //VARS assigned with old values -> no need to declare, just a wrapper
       }
 
 annotations :
