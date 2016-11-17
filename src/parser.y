@@ -200,27 +200,22 @@ vardecl_item :
       ti_expr_and_id annotations
              {
               SymbolTable::getInstance().globalInsert($1);
-              $1->printDecl();
+              $1->printDecl(true,NULL);
              } 
      | ti_expr_and_id annotations MZN_EQ expr
              {
               SymbolTable::getInstance().globalInsert($1,$4);
-              $1->printDecl();
-              if($1->getTi_type() == VAR || $1->getTi_type() == SETVAR){
-                Expr_node* c = new Expr(MZN_EQUIV, 2, new Literal(ID, $1->getID()), $4);
-                std::cout << "(assert ";
-                c->interpret();
-                std::cout << ")" << std::endl;
-              }
+              $1->printDecl(true,$4);
              } 
  
 assign_item :
       MZN_IDENTIFIER MZN_EQ expr
              {
                 string id = string($1);
-                Symbol* MySym = SymbolTable::getInstance().get(id);
-                if(MySym){
-                  MySym->setValue($3);
+                Symbol* mySym = SymbolTable::getInstance().get(id);
+                if(mySym){
+                  mySym->setValue($3);
+                  mySym->printDecl(false,$3);
                 }else{
                   std::cerr << "Assignment to a NOT DECLARED VAR: " << id << endl;
                   exit(0);
@@ -233,7 +228,7 @@ constraint_item :
                 if($2 != NULL){
                     std::cout << "(assert ";
                     $2->interpret();
-                    std::cout << ")" << endl;
+                    std::cout << ")" << std::endl << std::endl;
                 }else{
                     printf("warning: constraint not implemented! - parser.y\n");
                 }

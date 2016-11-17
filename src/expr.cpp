@@ -558,7 +558,7 @@ void Let::interpret(){
             string old_name = mySym->getID();
             Literal* wrap_value = new Literal(ID, old_name+"@_wrap_@");
             mySym->setID(wrap_value->getID());
-            mySym->printDecl();
+            mySym->printDecl(true,NULL);
             mySym->setID(old_name);
             mySym->setValue(wrap_value);
         } //else :: VARS assigned with old values -> no need to declare, just a wrapper

@@ -251,7 +251,7 @@ public:
 	string printName(string name,DNumber i,DNumber j,DNumber k);
 	void decideName(string name,DNumber i,DNumber j,DNumber k);
 	void printRange(string name, bool isArray, DNumber i,DNumber j,DNumber k, IntervalSet* range);
-	void printDecl();
+	void printDecl(bool toDeclare, Expr_node* value);
 };
 
 class HashTable {

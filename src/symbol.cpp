@@ -184,21 +184,38 @@ void Symbol::printRange(string name, bool isArray, DNumber i,DNumber j,DNumber k
     }
 }
 
-void Symbol::printDecl(){
+void Symbol::printDecl(bool toDeclare, Expr_node* value){
     if(ti_type == PAR || ti_type == SETPAR){
         return;
     }
 
     if(index == NULL){
-        std::cout << "(declare-fun "<< *id << " () "<< domain2str() <<" )"<< std::endl;
-        printRange(*id,false,0,0,0,range);
+        if(toDeclare){    
+            std::cout << "(declare-fun "<< *id << " () "<< domain2str() <<" )"<< std::endl;
+            printRange(*id,false,0,0,0,range);
+        }
+        if(value){
+            std::cout << "(assert (= " << *id << " ";
+            value->interpret();
+            std::cout << ")" << endl;
+        }
     }else{
         switch(this->index->size()){
             case 1:
                 //TODO:: think about fragmented index intervals: maybe if(isFragmented){ret ERROR} ??
                 for (IntervalSet::value_iterator it = ((*index)[0])->value_begin(), end = ((*index)[0])->value_end(); it != end; ++it) {
-                    decideName(*id,*it,0,0);
-                    printRange(*id,true,*it,0,0,range);
+                    if(toDeclare){
+                        decideName(*id,*it,0,0);
+                        printRange(*id,true,*it,0,0,range);
+                    }
+                    if(value){
+                        std::cout << "(assert (= " 
+                                    << printName(*id,*it,0,0)
+                                    << " ";
+                        int int_i = atoi( (*it).to_str().c_str() );
+                        getValue_at(int_i)->interpret();
+                        std::cout << ")" << endl;
+                    }
                 }
                 break;
             case 2:
@@ -207,8 +224,19 @@ void Symbol::printDecl(){
             it != end_1; ++it) {
                     for (IntervalSet::value_iterator itt = ((*index)[1])->value_begin(), end_2 = ((*index)[1])->value_end();
             itt != end_2; ++itt) {
-                        decideName(*id,*it,*itt,0);
-                        printRange(*id,true,*it,*itt,0,range);
+                        if(toDeclare){
+                            decideName(*id,*it,*itt,0);
+                            printRange(*id,true,*it,*itt,0,range);
+                        }
+                        if(value){
+                            std::cout << "(assert (= " 
+                                        << printName(*id,*it,*itt,0)
+                                        << " ";
+                            int int_i = atoi( (*it).to_str().c_str() );
+                            int int_j = atoi( (*itt).to_str().c_str() );
+                            getValue_at(int_i,int_j)->interpret();
+                            std::cout << ")" << endl;
+                        }
                     }
                 }
                 break;
