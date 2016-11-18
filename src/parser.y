@@ -418,8 +418,23 @@ base_ti_expr_tail:
      | set_expr
       {
         $$ = new Symbol();
-        $$->setRange(((Set*)$1)->getDomain(),((Set*)$1)->exportRange());
-        delete $1;
+        Expr_node* to_transform = $1;
+        Set* transformed;
+        if(dynamic_cast<Literal*>(to_transform)){
+            transformed = new Set(MZN_DOTDOT,
+                                  new Literal(INT,"0"),
+                                  to_transform);
+        }else{
+            if(dynamic_cast<Expr*>(to_transform)){
+                transformed = new Set(MZN_DOTDOT,
+                                      new Literal(INT,"0"),
+                                      to_transform->eval());
+            }else{
+              transformed = (Set*) to_transform;
+            }
+        }
+        $$->setRange((transformed)->getDomain(),(transformed)->exportRange());
+        //delete $1;
       }
     | MZN_TI_IDENTIFIER
       {
@@ -447,23 +462,7 @@ expr_list_head :
 set_expr :
       expr_atom_head
       {
-        //$$ = $1;
-        //SET EXPR -> needs Literals to construct an interval, so eval before pass up
-        Expr_node* tmp = $1;
-        if(dynamic_cast<Literal*>(tmp)){
-            Symbol* s = SymbolTable::getInstance().get(((Literal*)tmp)->getID());    
-            if(s == NULL){
-              $$ = tmp;
-            }else{
-              if(s->hasValue()){
-                $$ = s->getValue()->eval();
-              }else{
-                $$ = tmp;
-              }
-            }
-        }else{
-            $$ = tmp;
-        }
+        $$ = $1;
       }
     | set_expr MZN_COLONCOLON expr_atom_head
       {
