@@ -39,6 +39,13 @@ void ExprList::interpret(){
 		(*it)->interpret();
 		std::cout << std::endl;
 	}
+	// cout << endl;
+	// for (int i = 0; i < size(); ++i)
+	// {
+	// 	cout << endl;
+	// 	at(i)->interpret();
+	// 	cout << endl;
+	// }
 	return;
 }
 

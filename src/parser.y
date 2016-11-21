@@ -228,7 +228,7 @@ constraint_item :
                 if($2 != NULL){
                     std::cout << "(assert ";
                     $2->interpret();
-                    std::cout << ")" << std::endl << std::endl;
+                    std::cout << ")" << std::endl;
                 }else{
                     printf("warning: constraint not implemented! - parser.y\n");
                 }
@@ -420,10 +420,24 @@ base_ti_expr_tail:
         $$ = new Symbol();
         Expr_node* to_transform = $1;
         Set* transformed;
+        //to be put in SET constructor
         if(dynamic_cast<Literal*>(to_transform)){
-            transformed = new Set(MZN_DOTDOT,
-                                  new Literal(INT,"0"),
-                                  to_transform);
+            if(((Literal*) to_transform)->getDomain() == ID){
+                Symbol* mySym = SymbolTable::getInstance().get(((Literal*) to_transform)->getID());
+                if(mySym){
+                    if(mySym->hasValue()){
+                        transformed = (Set*) ((ExprList*) mySym->getValue())->at(0);
+                    }else{
+                        std::cerr << "cannot eval set_expr" << std::endl;  
+                    }
+                }else{
+                    std::cerr << "cannot find id in set_expr" << std::endl;
+                } 
+            }else{
+                transformed = new Set(MZN_DOTDOT,
+                                      new Literal(INT,"0"),
+                                      to_transform);  
+            }
         }else{
             if(dynamic_cast<Expr*>(to_transform)){
                 transformed = new Set(MZN_DOTDOT,
@@ -434,7 +448,7 @@ base_ti_expr_tail:
             }
         }
         $$->setRange((transformed)->getDomain(),(transformed)->exportRange());
-        //delete $1;
+        //delete no more needed. now it data comes from symboltable.
       }
     | MZN_TI_IDENTIFIER
       {
@@ -483,6 +497,7 @@ set_expr :
     | set_expr MZN_DOTDOT set_expr
       {
         $$ = new Set(MZN_DOTDOT,$1,$3);
+        //$$ = new Expr(MZN_DOTDOT,2,$1,$3);
       }
     | MZN_DOTDOT_QUOTED '(' expr ',' expr ')'
       {
@@ -618,8 +633,8 @@ expr :
       }
     | expr MZN_DOTDOT expr
       {
-        $$ = new Expr(MZN_DOTDOT,2,$1,$3);
-        //$$ = new Set(MZN_DOTDOT,$1,$3);
+        //$$ = new Expr(MZN_DOTDOT,2,$1,$3);
+        $$ = new Set(MZN_DOTDOT,$1,$3);
       }
     | MZN_DOTDOT_QUOTED '(' expr ',' expr ')'
       {

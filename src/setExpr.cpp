@@ -16,19 +16,34 @@ Set::Set(){
 }
 
 Set::Set(Expr_node* a){
-	//this->domain = INT;
-
 	// a is an ExprList necessarily due to grammar construction
 	// a should be a 1 dimension list (2 dim set has no sense)
-	set = new IntervalSet();
+	set = NULL;
+	this->domain = INT; //hardcoded -> only set of int
 	Expr_node* tmp;
 	//ExprList used as box for a vector of values
-	//to keep logic inside ExprList should implement wrapper for vector
 	ExprList* list = (ExprList*) a;
 	for(int i = 0; i < list->size(); i++){
 		tmp = list->at(i);
-		this->domain = ((Literal*) tmp)->getDomain();
-		set->add(Interval(((Literal*) tmp)->getValue()));
+		tmp = tmp->eval();
+		if(dynamic_cast<Literal*>(tmp)){
+			if(! set){
+				set = new IntervalSet(Interval(((Literal*) tmp)->getValue()));
+			}else{
+				set->add(Interval(((Literal*) tmp)->getValue()));
+			}
+		}else{
+			//should be a set
+			if(dynamic_cast<Set*>(tmp)){
+				if(! set){
+					set = ((Set*) tmp)->getSet();
+				}else{
+					set->set_union( *((Set*) tmp)->getSet() );	
+				}
+			}else{
+				std::cerr << "error set not supported" << std::endl;
+			}
+		}
 	}
 }
 
@@ -44,8 +59,7 @@ Set::Set(int oper, Expr_node* a, Expr_node* b){
 	}
 	switch(oper){
 		case MZN_DOTDOT:
-			//cout << ((Literal*) lb)->toString() << " - " << ((Literal*) ub)->toString() << endl;
-		    s = Interval(((Literal*) lb)->getValue(), ((Literal*) ub)->getValue());
+			s = Interval(((Literal*) lb)->getValue(), ((Literal*) ub)->getValue());
 			set = new IntervalSet(s);
 			break;
 		case MZN_UNION:
@@ -57,14 +71,15 @@ Set::Set(int oper, Expr_node* a, Expr_node* b){
 }
 
 IntervalSet* Set::exportRange(){
-	IntervalSet* tmp = this->set;
-	this->set = NULL;
-	return tmp;
+	// IntervalSet* tmp = this->set;
+	// this->set = NULL; reallyBAD
+	// return tmp;
+	//no more delete! this function is called from sets in symbolTable
+	return this->set;
 }
 
 void Set::interpret(){
-	std::cout << *set << endl;
-	//set->to_str();
+	std::cout << set->to_str() << endl;
 	return;
 }
 

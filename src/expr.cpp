@@ -489,10 +489,11 @@ void Fun::assignSet(std::queue<Expr_node*>* id_lit, Expr_node* e){
         ids = new std::vector<pair<Literal*,Set*>*>();
     }
     Expr_node* tmp;
+    Set* s = (Set*) e;//->eval();
+    
     while(!id_lit->empty()){
         tmp = id_lit->front();
         id_lit->pop();
-        Set* s = (Set*) e->eval();
         ids->push_back(new pair<Literal*,Set*>((Literal*)(tmp), s));    
     }
 }
@@ -501,13 +502,21 @@ void Fun::expand_args(){
     std::queue<Expr_node*>* id_lit = new std::queue<Expr_node*>();
     for (int i = 0; i < args->size(); ++i)
     {
-        while( ! dynamic_cast<Expr*>(args->at(i))){
-            id_lit->push(args->at(i));
-        }
         if(dynamic_cast<Expr*>(args->at(i))){
             Expr* e = (Expr*) args->at(i);
             id_lit->push(e->getOp_1());
-            assignSet(id_lit, e->getOp_2());
+            Expr_node* toAssign =  e->getOp_2();
+            if( ! dynamic_cast<Set*>(toAssign) ){
+                
+
+                toAssign =  toAssign->eval();
+                if( ! dynamic_cast<Set*>( toAssign ) ){
+                    cerr << "ERROR ASSIGNING SET" << endl;
+                }
+            }
+            assignSet(id_lit, toAssign);
+        }else{
+            id_lit->push(args->at(i)); 
         }
     }
     delete id_lit;

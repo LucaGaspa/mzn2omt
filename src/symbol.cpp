@@ -62,7 +62,7 @@ void Symbol::setID(string new_id){
 
 void Symbol::setValue(Expr_node* expr){
     if(dynamic_cast<ExprList*>(expr)){
-        value = (ExprList*)expr;
+        value = (ExprList*) expr;
     }else{
         value = new ExprList(expr);
     }
@@ -78,11 +78,7 @@ Expr_node* Symbol::getValue(){
 }
 
 bool Symbol::hasValue(){
-    if(value != NULL){
-        return true;
-    }else{
-        return false;
-    }
+    return value != NULL;
 }
 
 Expr_node* Symbol::getValue_at(int i){

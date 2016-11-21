@@ -80,8 +80,8 @@ void Literal::interpret(){
 				}
 			}else{
 				if(sym->hasValue()){
-					Literal* tmp = (Literal*)((Literal*) sym->getValue())->eval();
-					std::cout << tmp->toString();	
+					Expr_node* tmp = sym->getValue()->eval();
+					tmp->interpret();
 				}else{
 					std::cout << name;
 				}	
@@ -139,8 +139,8 @@ Expr_node* Literal::eval(){
 				}
 			}else{
 				if(sym->hasValue()){
-					Literal* tmp = (Literal*)((Literal*) sym->getValue())->eval();
-					return tmp;
+					//sym->getValue()->interpret();
+					return sym->getValue()->eval();
 				}else{
 					return this;
 				}	
